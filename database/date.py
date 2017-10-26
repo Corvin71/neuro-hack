@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 import random
 
@@ -13,7 +13,7 @@ def get_hours(day):
     hour = 0
     second = 0
     date = []
-    while i < 288:
+    while i < 72:
         second = random.randint(0, 59)
         if (minute < 10):
             minute_str = '0' + str(minute)
@@ -28,11 +28,11 @@ def get_hours(day):
         else:
             second_str = str(second)
         date.append(str(day) + '.10.2017 ' + hour_str + ':' + minute_str + ':' + second_str)
-        if (minute == 55):
+        if (minute == 40):
             hour += 1
             minute = 0
         else:
-            minute += 5
+            minute += 20
         i += 1
 
     return date
