@@ -2,10 +2,10 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 9.5.9
+-- Dumped from database version 9.6.1
 -- Dumped by pg_dump version 9.6.2
 
--- Started on 2017-10-25 23:13:30
+-- Started on 2017-10-27 01:16:02
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -17,8 +17,8 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- TOC entry 2187 (class 0 OID 0)
--- Dependencies: 7
+-- TOC entry 2157 (class 0 OID 0)
+-- Dependencies: 4
 -- Name: SCHEMA "public"; Type: COMMENT; Schema: -; Owner: postgres
 --
 
@@ -26,7 +26,7 @@ COMMENT ON SCHEMA "public" IS 'standard public schema';
 
 
 --
--- TOC entry 1 (class 3079 OID 12393)
+-- TOC entry 1 (class 3079 OID 12387)
 -- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
 --
 
@@ -34,7 +34,7 @@ CREATE EXTENSION IF NOT EXISTS "plpgsql" WITH SCHEMA "pg_catalog";
 
 
 --
--- TOC entry 2189 (class 0 OID 0)
+-- TOC entry 2158 (class 0 OID 0)
 -- Dependencies: 1
 -- Name: EXTENSION "plpgsql"; Type: COMMENT; Schema: -; Owner: 
 --
@@ -43,7 +43,7 @@ COMMENT ON EXTENSION "plpgsql" IS 'PL/pgSQL procedural language';
 
 
 --
--- TOC entry 2 (class 3079 OID 86234)
+-- TOC entry 2 (class 3079 OID 104216)
 -- Name: uuid-ossp; Type: EXTENSION; Schema: -; Owner: 
 --
 
@@ -51,7 +51,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA "public";
 
 
 --
--- TOC entry 2190 (class 0 OID 0)
+-- TOC entry 2159 (class 0 OID 0)
 -- Dependencies: 2
 -- Name: EXTENSION "uuid-ossp"; Type: COMMENT; Schema: -; Owner: 
 --
@@ -66,7 +66,7 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
--- TOC entry 183 (class 1259 OID 86225)
+-- TOC entry 187 (class 1259 OID 104306)
 -- Name: rooms; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -79,11 +79,11 @@ CREATE TABLE "rooms" (
 ALTER TABLE "rooms" OWNER TO "postgres";
 
 --
--- TOC entry 182 (class 1259 OID 86223)
--- Name: rooms_id_room_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- TOC entry 186 (class 1259 OID 104304)
+-- Name: room_id_room_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
-CREATE SEQUENCE "rooms_id_room_seq"
+CREATE SEQUENCE "room_id_room_seq"
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -91,19 +91,19 @@ CREATE SEQUENCE "rooms_id_room_seq"
     CACHE 1;
 
 
-ALTER TABLE "rooms_id_room_seq" OWNER TO "postgres";
+ALTER TABLE "room_id_room_seq" OWNER TO "postgres";
 
 --
--- TOC entry 2191 (class 0 OID 0)
--- Dependencies: 182
--- Name: rooms_id_room_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+-- TOC entry 2160 (class 0 OID 0)
+-- Dependencies: 186
+-- Name: room_id_room_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
-ALTER SEQUENCE "rooms_id_room_seq" OWNED BY "rooms"."id_room";
+ALTER SEQUENCE "room_id_room_seq" OWNED BY "rooms"."id_room";
 
 
 --
--- TOC entry 184 (class 1259 OID 86245)
+-- TOC entry 188 (class 1259 OID 104316)
 -- Name: sensors; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -118,57 +118,20 @@ CREATE TABLE "sensors" (
 ALTER TABLE "sensors" OWNER TO "postgres";
 
 --
--- TOC entry 187 (class 1259 OID 86287)
--- Name: status_boiler; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE "status_boiler" (
-    "key" "uuid" DEFAULT "uuid_generate_v4"() NOT NULL,
-    "sensor_id" "uuid" NOT NULL,
-    "consumgas" "text",
-    "consumelectric" "text",
-    "date" "text"
-);
-
-
-ALTER TABLE "status_boiler" OWNER TO "postgres";
-
---
--- TOC entry 2192 (class 0 OID 0)
--- Dependencies: 187
--- Name: TABLE "status_boiler"; Type: COMMENT; Schema: public; Owner: postgres
---
-
-COMMENT ON TABLE "status_boiler" IS 'Статистика бойлера';
-
-
---
--- TOC entry 2193 (class 0 OID 0)
--- Dependencies: 187
--- Name: COLUMN "status_boiler"."consumgas"; Type: COMMENT; Schema: public; Owner: postgres
---
-
-COMMENT ON COLUMN "status_boiler"."consumgas" IS 'расход воды';
-
-
---
--- TOC entry 2194 (class 0 OID 0)
--- Dependencies: 187
--- Name: COLUMN "status_boiler"."consumelectric"; Type: COMMENT; Schema: public; Owner: postgres
---
-
-COMMENT ON COLUMN "status_boiler"."consumelectric" IS 'Расход электричества';
-
-
---
--- TOC entry 186 (class 1259 OID 86273)
+-- TOC entry 189 (class 1259 OID 104330)
 -- Name: status_sensors; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE "status_sensors" (
     "key" "uuid" DEFAULT "uuid_generate_v4"() NOT NULL,
-    "sensor" "uuid",
-    "statec" "text",
+    "sensor_id" "uuid",
+    "consum_gas" "text",
+    "twister_gas" "text",
+    "celsium" "text",
+    "twister_cold" "text",
+    "twister_radiator" "text",
+    "energy" "text",
+    "smove" "text",
     "date" "text"
 );
 
@@ -176,57 +139,78 @@ CREATE TABLE "status_sensors" (
 ALTER TABLE "status_sensors" OWNER TO "postgres";
 
 --
--- TOC entry 2195 (class 0 OID 0)
--- Dependencies: 186
--- Name: TABLE "status_sensors"; Type: COMMENT; Schema: public; Owner: postgres
+-- TOC entry 2161 (class 0 OID 0)
+-- Dependencies: 189
+-- Name: COLUMN "status_sensors"."consum_gas"; Type: COMMENT; Schema: public; Owner: postgres
 --
 
-COMMENT ON TABLE "status_sensors" IS 'Состояние датчиков (задвижки и прочее)';
-
-
---
--- TOC entry 2196 (class 0 OID 0)
--- Dependencies: 186
--- Name: COLUMN "status_sensors"."statec"; Type: COMMENT; Schema: public; Owner: postgres
---
-
-COMMENT ON COLUMN "status_sensors"."statec" IS 'Для плавающих значений';
+COMMENT ON COLUMN "status_sensors"."consum_gas" IS 'Расход газа';
 
 
 --
--- TOC entry 185 (class 1259 OID 86259)
--- Name: weather; Type: TABLE; Schema: public; Owner: postgres
+-- TOC entry 2162 (class 0 OID 0)
+-- Dependencies: 189
+-- Name: COLUMN "status_sensors"."twister_gas"; Type: COMMENT; Schema: public; Owner: postgres
 --
 
-CREATE TABLE "weather" (
-    "key" "uuid" DEFAULT "uuid_generate_v4"() NOT NULL,
-    "sensor_id" "uuid" NOT NULL,
-    "celsium" "text",
-    "date" "text"
-);
+COMMENT ON COLUMN "status_sensors"."twister_gas" IS 'Крутилка газа';
 
-
-ALTER TABLE "weather" OWNER TO "postgres";
 
 --
--- TOC entry 2049 (class 2604 OID 86228)
+-- TOC entry 2163 (class 0 OID 0)
+-- Dependencies: 189
+-- Name: COLUMN "status_sensors"."celsium"; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN "status_sensors"."celsium" IS 'Температура в комнате';
+
+
+--
+-- TOC entry 2164 (class 0 OID 0)
+-- Dependencies: 189
+-- Name: COLUMN "status_sensors"."twister_cold"; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN "status_sensors"."twister_cold" IS 'Крутилка кондиционера';
+
+
+--
+-- TOC entry 2165 (class 0 OID 0)
+-- Dependencies: 189
+-- Name: COLUMN "status_sensors"."twister_radiator"; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN "status_sensors"."twister_radiator" IS 'Крутилка газа';
+
+
+--
+-- TOC entry 2166 (class 0 OID 0)
+-- Dependencies: 189
+-- Name: COLUMN "status_sensors"."energy"; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN "status_sensors"."energy" IS 'Потребляемая энергия';
+
+
+--
+-- TOC entry 2023 (class 2604 OID 104309)
 -- Name: rooms id_room; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY "rooms" ALTER COLUMN "id_room" SET DEFAULT "nextval"('"rooms_id_room_seq"'::"regclass");
+ALTER TABLE ONLY "rooms" ALTER COLUMN "id_room" SET DEFAULT "nextval"('"room_id_room_seq"'::"regclass");
 
 
 --
--- TOC entry 2055 (class 2606 OID 86233)
--- Name: rooms rooms_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- TOC entry 2027 (class 2606 OID 104314)
+-- Name: rooms room_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY "rooms"
-    ADD CONSTRAINT "rooms_pkey" PRIMARY KEY ("id_room");
+    ADD CONSTRAINT "room_pkey" PRIMARY KEY ("id_room");
 
 
 --
--- TOC entry 2057 (class 2606 OID 86253)
+-- TOC entry 2029 (class 2606 OID 104324)
 -- Name: sensors sensors_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -235,16 +219,7 @@ ALTER TABLE ONLY "sensors"
 
 
 --
--- TOC entry 2063 (class 2606 OID 86295)
--- Name: status_boiler status_boiler_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY "status_boiler"
-    ADD CONSTRAINT "status_boiler_pkey" PRIMARY KEY ("key");
-
-
---
--- TOC entry 2061 (class 2606 OID 86281)
+-- TOC entry 2032 (class 2606 OID 104338)
 -- Name: status_sensors status_sensors_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -253,16 +228,15 @@ ALTER TABLE ONLY "status_sensors"
 
 
 --
--- TOC entry 2059 (class 2606 OID 86267)
--- Name: weather weather_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- TOC entry 2030 (class 1259 OID 104344)
+-- Name: status_sensors_key_uindex; Type: INDEX; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY "weather"
-    ADD CONSTRAINT "weather_pkey" PRIMARY KEY ("key");
+CREATE UNIQUE INDEX "status_sensors_key_uindex" ON "status_sensors" USING "btree" ("key");
 
 
 --
--- TOC entry 2064 (class 2606 OID 86254)
+-- TOC entry 2033 (class 2606 OID 104325)
 -- Name: sensors sensors_rooms_id_room_fk; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -271,45 +245,15 @@ ALTER TABLE ONLY "sensors"
 
 
 --
--- TOC entry 2067 (class 2606 OID 86296)
--- Name: status_boiler status_boiler_sensors_id_sensor_fk; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY "status_boiler"
-    ADD CONSTRAINT "status_boiler_sensors_id_sensor_fk" FOREIGN KEY ("sensor_id") REFERENCES "sensors"("id_sensor");
-
-
---
--- TOC entry 2066 (class 2606 OID 86282)
+-- TOC entry 2034 (class 2606 OID 104339)
 -- Name: status_sensors status_sensors_sensors_id_sensor_fk; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY "status_sensors"
-    ADD CONSTRAINT "status_sensors_sensors_id_sensor_fk" FOREIGN KEY ("sensor") REFERENCES "sensors"("id_sensor");
+    ADD CONSTRAINT "status_sensors_sensors_id_sensor_fk" FOREIGN KEY ("sensor_id") REFERENCES "sensors"("id_sensor");
 
 
---
--- TOC entry 2065 (class 2606 OID 86268)
--- Name: weather weather_sensors_id_sensor_fk; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY "weather"
-    ADD CONSTRAINT "weather_sensors_id_sensor_fk" FOREIGN KEY ("sensor_id") REFERENCES "sensors"("id_sensor");
-
-
---
--- TOC entry 2188 (class 0 OID 0)
--- Dependencies: 7
--- Name: public; Type: ACL; Schema: -; Owner: postgres
---
-
-REVOKE ALL ON SCHEMA "public" FROM PUBLIC;
-REVOKE ALL ON SCHEMA "public" FROM "postgres";
-GRANT ALL ON SCHEMA "public" TO "postgres";
-GRANT ALL ON SCHEMA "public" TO PUBLIC;
-
-
--- Completed on 2017-10-25 23:13:31
+-- Completed on 2017-10-27 01:16:03
 
 --
 -- PostgreSQL database dump complete
