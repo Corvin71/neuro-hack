@@ -121,7 +121,7 @@ def main():
         while True:
             # Основной цикл программы
             if days_left == 0:
-                d = get_data(False)
+                d = get_data(False, '10.10.2017')
                 if d == []:
                     return
                 if econom_mode_on(d):

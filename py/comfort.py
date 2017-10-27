@@ -6,10 +6,6 @@ import random as rnd
 def f(x):
     return 1.0 / (1.0 + np.exp(-x))
 
-# Функция ошибки
-def mse(y_actual, y_ideal):
-    return [np.power(y_a - y_i, 2) for y_a, y_i in zip(y_actual, y_ideal)] / len(y_actual)
-
 # Инициализация сети
 def init(N):
     W = np.zeros(shape=(2*N, 2*N + 1))
@@ -24,12 +20,19 @@ def init(N):
 
 # Одна итерация обучения
 def learn_iter(x, y, net):
-    
-    return 0.0 # Возврат ошибки
+    y_act = calc(x, net)
+    u = net.dot(x)
+    dW = (np.average(y_act - y)* np.power(f(u), 2) * np.exp(-u) * (np.ones(net.shape) * x).T).T
+    dW *= (net != 0) + np.zeros(net.shape)
+    return dW
 
 # Одна эпоха обучения (день)
 def learn_epoch(X, Y, net):
-    return [] # возврат обученной сети
+    dW = np.zeros(net.shape)
+    for i in range(len(X)):
+        dW += learn_iter(X[i], Y[i], net)
+    dW /= len(X)
+    return net - dW
 
 # Расчёт по нейронной сети
 def calc(datapiece, net):
