@@ -1,29 +1,35 @@
 # -*- coding: UTF-8 -*-
-# ДОБАВИТЬ И ИСПРАВИТЬ ГЕНЕРАЦИЮ ДАННЫХ ДЛЯ КАЖДОЙ НЕЙРОСЕТИ!
 import sys
+import json as j
 import time as t
 import urllib as u
 import comfort as c
 import econom as e
 address = 'http://corvin71.ddns.net'
 path = '/smartHack/Server/data_collection.php'
-learning = '?is_learning=1'
+is_learning = '?is_learning='
 rooms = '?how_rooms=1'
 post = ''
 save = ''
 load = ''
 
+''' Отладка!!! '''
+from datetime import timedelta
+import datetime
+
 ''' Работа с удалённым сервером '''
 # Получает данные с сервера уже в виде вектора.
 # Если is_learning == True, то получает данные для обучения
 # (вместе со всеми крутилками).
-def get_data(is_learning):
-    if is_learning:
+def get_data(learning, day):
+    if learning:
         #t.sleep(86400) # Ждём 24 часа
-        response = u.urlopen(address + path + learning)
+        t.sleep(1)
+        #response = u.urlopen(address + path + is_learning + d.datetime.strftime(d.datetime.today().date(), "%d.%m.%Y")
+        response = u.urlopen(address + path + is_learning + datetime.datetime.strftime(day, "%d.%m.%Y"))
     else:
         response = u.urlopen(address + path)
-    return []
+    return j.loads(response.read()[3:])
 
 def post_data(result):
     return # Возвращает результат работы нейронок result на сервер
@@ -51,10 +57,14 @@ def econom(datapiece, c_net, e_net):
 
 ''' Запись и загрузка нейронок '''
 def save_net(c_net, e_net, days_left):
+    with open('neuronet', 'w') as f:
+        f.write(str(c_net) + '\n')
+        f.write(str(e_net) + '\n')
+        f.write(str(days_left))
     return # Сохраняет сети и количество дней (в файл или на сервер)
 
 def load_net():
-    return [], [], 0 # Загружает сети и количество (из файла или с сервера)
+    return [], [], 7 # Загружает сети и количество (из файла или с сервера)
 
 ''' Служебное '''
 # Определяет, включен ли режим "Эконом"
@@ -66,13 +76,13 @@ def to_c_blocks(datablock):
     x = []
     y = []
     for datapiece in datablock:
-        temp_x = [datapiece[1]]
-        for i in range(2, len(datapiece), 4):
+        temp_x = [datapiece[0]]
+        for i in range(3, len(datapiece), 5):
             temp_x.append(datapiece[i])
             temp_x.append(datapiece[i + 1])
         x.append(temp_x)
         temp_y = []
-        for i in range(4, len(datapiece), 4):
+        for i in range(5, len(datapiece), 5):
             temp_y.append(datapiece[i])
             temp_y.append(datapiece[i + 1])
         y.append(temp_y)
@@ -83,7 +93,18 @@ def to_e_blocks(datablock):
     x = []
     y = []
     for datapiece in datablock:
-        
+        temp_x = []
+        for i in range(3, len(datapiece), 5):
+            temp_x.append(datapiece[i])
+            temp_x.append(datapiece[i + 3])
+            temp_x.append(datapiece[i + 2])
+        temp_x.append(datapiece[2])
+        x.append(temp_x)
+        s = 0
+        for i in range(7, len(datapiece), 5):
+            s += datapiece[i]
+        temp_y = [datapiece[1], s]
+        y.append(temp_y)
     return x, y
 
 ''' Главная функция '''
@@ -93,7 +114,7 @@ def main():
             # Проверка аргументов?
             c_net, e_net, days_left = load_net() # Загружаем сети и количество дней
         else:
-            n = int(u.urlopen(address + path + rooms).read())
+            n = int(u.urlopen(address + path + rooms).read()[3:])
             c_net, e_net = c.init(n), e.init(n) # Создаём сети
             days_left = 7 # Неделя на обучение
 
@@ -110,14 +131,12 @@ def main():
                 post_data(result)
             else:
                 # Обучение
-                d = get_data(True)
+                day = datetime.date(2017, 10, 11) # Отладка!!!
+                d = get_data(True, day)
+                day += timedelta(days=1) # Отладка!!!
                 if d == []:
                     return
                 c_net, e_net, days_left = learning(d, c_net, e_net, days_left)
     return
 
-#main()
-
-q = [['T', 'G', 'g', 't1', 'p1', 'C1', 'R1', 'E1', 't2', 'p2', 'C2', 'R2', 'E2'],['T', 'G', 'g', 'T', 't1', 'p1', 'C1', 'R1', 'E1', 't2', 'p2', 'C2', 'R2', 'E2']]
-x, y = to_c_blocks(q)
-print x, y
+main()

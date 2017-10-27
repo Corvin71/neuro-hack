@@ -12,7 +12,7 @@ def layer2Ans(V, x):
     return V.dot(x)
 
 # Инициализация сети
-def init():
+def init(N):
     W = np.zeros(shape=(N, 3*N+1))
     for i in range(N):
         for k in range(3):
@@ -23,14 +23,14 @@ def init():
 
 # Одна итерация обучения
 def learn_iter(x, y, net):
-    ans = netAnswer(inVector) # ans = {a1, a2} - выход сети. a1 - расход газа, a2 - электричества
-    u = layer1Ans(inVector) # u - выход 1 слоя БЕЗ ФУНКЦИИ АКТИВАЦИИ
+    ans = calc(x, net) # ans = {a1, a2} - выход сети. a1 - расход газа, a2 - электричества
+    u = layer1Ans(net[0], x) # u - выход 1 слоя БЕЗ ФУНКЦИИ АКТИВАЦИИ
     # dV
-    dV = (2*(y-trueAns)*(((np.ones(net[1].shape).T * np.power(y, 2)).T * f(u)).T * np.exp(-net[1].dot(f(u))))).T
+    dV = (2*(ans-y)*(((np.ones(net[1].shape).T * np.power(ans, 2)).T * f(u)).T * np.exp(-net[1].dot(f(u))))).T
     # dW
     Vs = np.average(net[1], axis=0) # матрица (вектор) V'
     dW = np.power(f(Vs.dot(f(u))), 2)*np.exp(-Vs.dot(f(u)))*Vs*np.power(f(u), 2)*np.exp(-u)
-    dW = (2*(ans-y)*np.ones(net[0].shape).T * dW).T * inVector
+    dW = (2*np.average(ans-y)*np.ones(net[0].shape).T * dW).T * x
     mW = (net[0]!=0) + np.zeros(net[0].shape) # маска элементов матрицы W
     dW *= mW
     
@@ -51,5 +51,3 @@ def learn_epoch(x, y, net):
 # Расчёт по нейронной сети
 def calc(datapiece, net):
     return f(layer2Ans(net[1], f(layer1Ans(net[0], np.array(datapiece)))))
-
-
