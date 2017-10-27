@@ -131,4 +131,25 @@ function preprocess_data($data)
     return $data;
 }
 
+
+
+
+function timeToValue($time)
+{
+	$sources_time = explode(":", explode(" ", $time)[1]);
+	$second       = intval($sources_time[2]);
+	$minute       = intval($sources_time[1]);
+	$hour         = intval($sources_time[0]);
+	$allSeconds   = $second + $minute * 60 + $hour * 3600;
+
+	return $allSeconds / 86400;
+}
+
+function _sql($query) {
+	$log  = "postgres";
+	$pass = "123456";
+	$host = "localhost";
+	return sql_user($host, "smartHack", "5432", $log, $pass, $query);
+}
+
 ?>

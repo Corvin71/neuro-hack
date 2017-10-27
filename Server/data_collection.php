@@ -76,24 +76,9 @@ if (isset($_GET["is_learning"]))
 }
 
 if (isset($_GET["how_rooms"])) {
-	echo 5;
+	echo _sql("SELECT count(*) FROM public.rooms WHERE name NOT LIKE 'Бойлерная'")[0]["count"];
 }
 
-
-function timeToValue($time)
-{
-	$sources_time = explode(":", explode(" ", $time)[1]);
-	$second       = intval($sources_time[2]);
-	$minute       = intval($sources_time[1]);
-	$hour         = intval($sources_time[0]);
-	$allSeconds   = $second + $minute * 60 + $hour * 3600;
-
-	return $allSeconds / 86400;
-}
-
-function _sql($query) {
-	$log  = "postgres";
-	$pass = "123456";
-	$host = "localhost";
-	return sql_user($host, "smartHack", "5432", $log, $pass, $query);
+if (isset($_POST["log"]) && ($_POST["log"] != "")) {
+	_sql("INSERT INTO public.logs(log) VALUES ('" .$_POST["log"] ."')");
 }
