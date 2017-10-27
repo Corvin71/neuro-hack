@@ -1,5 +1,6 @@
 # -*- coding: UTF-8 -*-
 import sys
+import urllib2
 import json as j
 import time as t
 import urllib as u
@@ -106,6 +107,13 @@ def to_e_blocks(datablock):
         temp_y = [datapiece[1], s]
         y.append(temp_y)
     return x, y
+
+#Функция выгрузки лога на сервер.
+def uploadServer(uploadInfo):
+    postData = "log=" + uploadInfo
+    request = urllib2.Request(address + path, postData)
+    response = urllib2.urlopen(request)
+
 
 ''' Главная функция '''
 def main():
