@@ -1,4 +1,4 @@
-# -*- coding: UTF-8 -*-
+﻿# -*- coding: UTF-8 -*-
 import numpy as np
 import random as rnd
 
@@ -22,7 +22,7 @@ def init(N):
 def learn_iter(x, y, net):
     y_act = calc(x, net)
     u = net.dot(x)
-    dW = (np.average(y_act - y)* np.power(f(u), 2) * np.exp(-u) * (np.ones(net.shape) * x).T).T
+    dW = (2 * np.average(y_act - y) * np.power(f(u), 2) * np.exp(-u) * (np.ones(net.shape) * x).T).T
     dW *= (net != 0) + np.zeros(net.shape)
     return dW
 
