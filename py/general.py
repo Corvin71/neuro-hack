@@ -53,11 +53,14 @@ def learning(datablock, c_net, e_net, days_left):
 
 # Возвращает вектор крутилок при поддержании режима "Комфорт"
 def comfort(datapiece, c_net):
-    return c.calc(datapiece, c_net)
+    x, y = to_c_block(datapiece)
+    return c.calc(x, c_net)
 
 # Возвращает вектор крутилок при поддержании режима "Эконом"
 def econom(datapiece, c_net, e_net):
-    c_res = c.calc(datapiece, c_net)
+    x_c = to_work_c_block(datapiece)
+    c_res = c.calc(x_c, c_net)
+    x_e = to_work_e_block(datapiece, c_res)
     e_res = e.calc(c_res, e_net)
     return c_res + e_res
 
@@ -76,10 +79,25 @@ def load_net(path):
     log('Loading complete. Days for learning left: ' + str(obj[2]))
     return obj[0], obj[1], obj[2]
 
-''' Служебное '''
-# Определяет, включен ли режим "Эконом"
-def econom_mode_on(datapiece):
-    return True
+''' Генераторы выборок '''
+# Генерация рабочей выборки для "Комфорта"
+def to_work_c_block(datapiece):
+    x = [datapiece[0]]
+    for i in range(3, len(datapiece), 4):
+        x.append(datapiece[i])
+        x.append(datapiece[i + 1])
+    return x
+
+# Генерация рабочей выборки для "Эконома"
+def to_work_e_block(datapiece, twisters):
+    x = []
+    j = 0
+    for i in range(len(twisters) - 1):
+        x.append(twisters[i + 1])
+        x.append(twisters[i])
+        x.append(datapiece[i + 2*j])
+        j += 1
+    return x
 
 # Генерация обучающей выборки для "Комфорта"
 def to_c_blocks(datablock):
@@ -116,6 +134,11 @@ def to_e_blocks(datablock):
         temp_y = [datapiece[1], s]
         y.append(temp_y)
     return x, y
+
+''' Служебное '''
+# Определяет, включен ли режим "Эконом"
+def econom_mode_on(datapiece):
+    return datapiece[0] == 0
 
 # Ожидание данных
 def await():
@@ -224,5 +247,3 @@ def debug():
                     return
                 c_net, e_net, days_left = learning(data, c_net, e_net, days_left)
     return
-
-#main()
