@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 import numpy as np
 import random as rnd
+from scipy.optimize import minimize
 
 def f(x):
     return 1/(1+np.exp(-x))
@@ -20,6 +21,24 @@ def init(N):
     W[i, 3*(N-1)+3] = rnd.random()
     V = np.random.rand(2,N)
     return [W, V]
+
+# Вспомогательная функция для оптимизации. На вход получает массивы крутилок и температур
+def g(twisters, temps, net):
+    # twisters - массив показаний крутилок вида: [Р1 К1 Р2 К2 ... Рn Кn Г]
+    # temps - массив температур вида: [Т1 Т2 ... Тn]
+    x = np.zeros((np.array(twisters).size + np.array(temps).size,), dtype=twisters.dtype)
+    x[0:-1:3] = twisters[0:-1:2]
+    x[1:-1:3] = twisters[1:-1:2]
+    x[2:-1:3] = temps
+    x[-1] = twisters[-1]
+    return calc(x, net).dot([0.5, 0.5])
+
+# Функция оптимизации, возвращает показания крутилок в [0, 1].
+# Формат выхода: [Р1 К1 Р2 К2 ... Рn Кn Г]
+def optimize(temps, net):
+    bounds = np.c_[np.zeros(2*N+1), np.ones(2*N+1)]
+    res = minimize(g, np.zeros(2*N+1), args=(temps,net,), bounds=bounds, tol=1e-10)
+    return res.x
 
 # Одна итерация обучения
 def learn_iter(x, y, net):
