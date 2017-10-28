@@ -1,38 +1,41 @@
 # -*- coding: UTF-8 -*-
 import sys
+import numpy as np
 import json as j
 import time as t
+import datetime as d
 import urllib as u
+import urllib2 as u2
 import comfort as c
 import econom as e
 address = 'http://corvin71.ddns.net'
 path = '/smartHack/Server/data_collection.php'
 is_learning = '?is_learning='
 rooms = '?how_rooms=1'
-post = ''
 save = ''
 load = ''
 
 ''' Отладка!!! '''
 from datetime import timedelta
-import datetime
 
 ''' Работа с удалённым сервером '''
 # Получает данные с сервера уже в виде вектора.
 # Если is_learning == True, то получает данные для обучения
 # (вместе со всеми крутилками).
-def get_data(learning, day):
+def get_data(learning=False, day=d.datetime.today().date()):
     if learning:
-        #t.sleep(86400) # Ждём 24 часа
-        t.sleep(1)
-        #response = u.urlopen(address + path + is_learning + d.datetime.strftime(d.datetime.today().date(), "%d.%m.%Y")
-        response = u.urlopen(address + path + is_learning + datetime.datetime.strftime(day, "%d.%m.%Y"))
+        response = u.urlopen(address + path + is_learning + d.datetime.strftime(day, "%d.%m.%Y"))
     else:
+        log('Listening to sever')
         response = u.urlopen(address + path)
+        log('Answer received')
     return j.loads(response.read()[3:])
 
+# Загружает полученную информацию на сервер
 def post_data(result):
-    return # Возвращает результат работы нейронок result на сервер
+    postData = "log=" + result
+    request = u2.Request(address + path, postData)
+    response = u2.urlopen(request)
 
 ''' Обучение и эксплуатация нейронок '''
 # Вызывается, когда нужно обучить сеть.
@@ -42,8 +45,11 @@ def learning(datablock, c_net, e_net, days_left):
     Xe, Ye = to_e_blocks(datablock)
     c_net = c.learn_epoch(Xc, Yc, c_net)
     e_net = e.learn_epoch(Xe, Ye, e_net)
-    save_net(c_net, e_net, days_left - 1) # Сохранение данных каждый день
-    return c_net, e_net, days_left - 1
+    days_left -= 1
+    save_net(c_net, e_net, days_left) # Сохранение данных каждый день
+    if days_left != 0:
+        await()
+    return c_net, e_net, days_left
 
 # Возвращает вектор крутилок при поддержании режима "Комфорт"
 def comfort(datapiece, c_net):
@@ -56,15 +62,19 @@ def econom(datapiece, c_net, e_net):
     return c_res + e_res
 
 ''' Запись и загрузка нейронок '''
+# Сохраняет сети и количество дней (в файл или на сервер)
 def save_net(c_net, e_net, days_left):
-    with open('neuronet', 'w') as f:
-        f.write(str(c_net) + '\n')
-        f.write(str(e_net) + '\n')
-        f.write(str(days_left))
-    return # Сохраняет сети и количество дней (в файл или на сервер)
+    with open('neuronet.npy', 'wb') as f:
+        np.save(f, np.array([c_net, e_net, days_left]))
+    log('Epoch complete. Left (days): ' + str(days_left))
+    return
 
-def load_net():
-    return [], [], 7 # Загружает сети и количество (из файла или с сервера)
+# Загружает сети и количество (из файла или с сервера)
+def load_net(path):
+    with open(path, 'rb') as f:
+        obj = np.load(f)
+    log('Loading complete. Days for learning left: ' + str(obj[2]))
+    return obj[0], obj[1], obj[2]
 
 ''' Служебное '''
 # Определяет, включен ли режим "Эконом"
@@ -107,36 +117,112 @@ def to_e_blocks(datablock):
         y.append(temp_y)
     return x, y
 
-''' Главная функция '''
-def main():
-    if __name__ == "__main__":
-        if len(sys.argv) > 1:
-            # Проверка аргументов?
-            c_net, e_net, days_left = load_net() # Загружаем сети и количество дней
-        else:
-            n = int(u.urlopen(address + path + rooms).read()[3:])
-            c_net, e_net = c.init(n), e.init(n) # Создаём сети
-            days_left = 7 # Неделя на обучение
+# Ожидание данных
+def await():
+    tm = 5
+    while tm > 0:
+        log('I am alive')
+        tm -= 1
+        t.sleep(1) # Отладка!!!
 
+# Ведение логов
+def log(message):
+    message = str(d.datetime.today()) + ': ' + message
+    print message
+    with open('logs.log', 'a') as log:
+        log.write(message + '\n')
+
+# Завершение работы
+def halt():
+    log('Halt')
+    raise SystemExit
+
+''' Параметры командной строки '''
+# Инициализация системы
+def initialization():
+    n = int(u.urlopen(address + path + rooms).read()[3:]) # Всегда считываются 3 левых символа - убираем
+    c_net, e_net = c.init(n), e.init(n) # Создаём сети
+    days_left = 7 # Неделя на обучение
+    return c_net, e_net, days_left
+
+# Режим продолжения
+def continue_mode():
+    log('Started in continue-mode')
+    c_net, e_net, days_left = load_net('neuronet.npy') # Загружаем сети и количество дней
+    combine_mode(c_net, e_net, days_left)
+
+# Режим обучения
+def learn_only_mode():
+    log('Started in learn-only-mode')
+    c_net, e_net, days_left = initialization()
+    while days_left > 0:
+        datablock = get_data(learning=True)
+        c_net, e_net, days_left = learning(datablock, c_net, e_net, days_left)
+    log('Successfully learned')
+    return
+
+# Комбинированный режим (обучение и продолжение)
+def combine_mode(c_net, e_net, days_left):
+    # Если сеть ещё не обучилась
+    while days_left > 0:
+        datablock = get_data(learning=True)
+        c_net, e_net, days_left = learning(datablock, c_net, e_net, days_left)
+    # Сеть уже обучилась
+    data = get_data()
+    if econom_mode_on(data):
+        result = econom(data, c_net, e_net)
+    else:
+        result = comfort(data, c_net)
+    post_data(result)
+    return
+
+# Выбор паттерна введённых параметров
+def pattern(param):
+    return {
+        param == '--continue-mode' or param == '-cm': continue_mode,
+        param == '--learn-only-mode' or param == '-lom': learn_only_mode,
+        param == '--help' or param == '-h': help_mode
+    }[True]
+
+# Справка
+def help_mode():
+    print "9 HE CyMEJI IIO4uHuTb KOguPOBKy, TAK 4TO COCHuTE XEP - CIIPABKu HE 6ygET!"
+    return
+
+''' Главная функция '''
+def debug():
+    if __name__ == "__main__":
+
+        # ЭТОТ КОД НЕ ВЫПОЛНЯЕТСЯ! ЭТА ФУНКЦИЯ ПОДЛЕЖИТ УДАЛЕНИЮ!
+        if len(sys.argv) > 1:
+            pattern(sys.argv[1])()
+        else:
+            c_net, e_net, days_left = initialization()
+            combine_mode()
+            
+    else:
+        ''' ОТЛАДКА!!! '''
+        c_net, e_net, days_left = initialization()
         while True:
             # Основной цикл программы
             if days_left == 0:
-                d = get_data(False)
-                if d == []:
+                halt() # Отладка!!!
+                data = get_data(False)
+                if data == []:
                     return
                 if econom_mode_on(d):
-                    result = econom(d, c_net, e_net)
+                    result = econom(data, c_net, e_net)
                 else:
-                    result = comfort(d, c_net)
+                    result = comfort(data, c_net)
                 post_data(result)
             else:
                 # Обучение
-                day = datetime.date(2017, 10, 11) # Отладка!!!
-                d = get_data(True, day)
+                day = d.date(2017, 10, 11) # Отладка!!!
+                data = get_data(True, day)
                 day += timedelta(days=1) # Отладка!!!
-                if d == []:
+                if data == []:
                     return
-                c_net, e_net, days_left = learning(d, c_net, e_net, days_left)
+                c_net, e_net, days_left = learning(data, c_net, e_net, days_left)
     return
 
-main()
+#main()

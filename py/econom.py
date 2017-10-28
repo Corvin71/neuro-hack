@@ -1,4 +1,4 @@
-# -*- coding: UTF-8 -*-
+﻿# -*- coding: UTF-8 -*-
 import numpy as np
 import random as rnd
 from scipy.optimize import minimize
