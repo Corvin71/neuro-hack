@@ -132,8 +132,6 @@ function preprocess_data($data)
 }
 
 
-
-
 function timeToValue($time)
 {
 	$sources_time = explode(":", explode(" ", $time)[1]);
@@ -150,6 +148,10 @@ function _sql($query) {
 	$pass = "123456";
 	$host = "localhost";
 	return sql_user($host, "smartHack", "5432", $log, $pass, $query);
+}
+
+function amountRooms() {
+	return _sql("SELECT count(*) FROM public.rooms WHERE name NOT LIKE 'Бойлерная'")[0]["count"];
 }
 
 ?>
