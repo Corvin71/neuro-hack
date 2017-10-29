@@ -100,20 +100,20 @@ if (isset($_GET["get_rooms"]))
 	{
 		$result[$i] = $amountRooms[$i]["name"];
 	}
-
+	
 	echo json_encode($result, JSON_UNESCAPED_UNICODE);
 }
 
 //Запускает или останавливает нейросеть.
 if (isset($_GET["state_neuron"]) && isset($_GET["id_room"])) {
-	//Здесь действие для деактивации сети.
-	if ($_GET["state_neuron"] == "t") {
+		exec("python ../neurohouse.py -cm");
+		$res = _sql("SELECT * FROM public.logs ORDER BY date DESC LIMIT 1");
+		echo $res[0]["log"] ."   " .$res[0]["date"];
+}
 
-	}
-	//А здесь действие для активации сети.
-	else if ($_GET["state_neuron"] == "f") {
-		$result = exec("cmd");
-	}
+if(isset($_POST["ans"])) {
+	_sql("INSERT INTO public.logs(log) VALUES ('" . $_POST["ans"] . "')");
+	$answer = $_POST["ans"];
 }
 
 //Запись логов в базу данных.
