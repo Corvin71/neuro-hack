@@ -33,7 +33,7 @@ def get_data(learning=False, day=d.datetime.today().date()):
 
 # Загружает полученную информацию на сервер
 def post_data(result):
-    postData = "log=" + result
+    postData = "ans=" + str(result)
     request = u2.Request(address + path, postData)
     response = u2.urlopen(request)
 
@@ -196,7 +196,9 @@ def combine_mode(c_net, e_net, days_left):
         result = econom(data, c_net, e_net)
     else:
         result = comfort(data, c_net)
-    post_data(result)
+    ''' Отладка!!! '''
+    post_data([1,1,1])
+    #post_data(result)
     return
 
 # Выбор паттерна введённых параметров
