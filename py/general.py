@@ -201,11 +201,16 @@ def combine_mode(c_net, e_net, days_left):
     #post_data(result)
     return
 
+def debug_mode():
+    post_data([1,1,1,1,1])
+    return
+
 # Выбор паттерна введённых параметров
 def pattern(param):
     return {
         param == '--continue-mode' or param == '-cm': continue_mode,
         param == '--learn-only-mode' or param == '-lom': learn_only_mode,
+        param == '--debug' or param == '-d': debug_mode,
         param == '--help' or param == '-h': help_mode
     }[True]
 
