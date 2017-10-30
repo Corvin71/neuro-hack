@@ -62,7 +62,7 @@ def econom(datapiece, c_net, e_net):
     c_res = c.calc(x_c, c_net)
     x_e = to_work_e_block(datapiece, c_res)
     e_res = e.calc(c_res, e_net)
-    return c_res + e_res
+    return e_res
 
 ''' Запись и загрузка нейронок '''
 # Сохраняет сети и количество дней (в файл или на сервер)
@@ -168,11 +168,15 @@ def initialization():
     days_left = 7 # Неделя на обучение
     return c_net, e_net, days_left
 
-# Режим продолжения
+# Режим продолжения прерванного обучения
 def continue_mode():
     log('Started in continue-mode')
     c_net, e_net, days_left = load_net('neuronet.npy') # Загружаем сети и количество дней
-    combine_mode(c_net, e_net, days_left)
+    while days_left > 0:
+        datablock = get_data(learning=True)
+        c_net, e_net, days_left = learning(datablock, c_net, e_net, days_left)
+    log('Successfully learned')
+    return
 
 # Режим обучения
 def learn_only_mode():
@@ -184,32 +188,31 @@ def learn_only_mode():
     log('Successfully learned')
     return
 
-# Комбинированный режим (обучение и продолжение)
-def combine_mode(c_net, e_net, days_left):
-    # Если сеть ещё не обучилась
-    while days_left > 0:
-        datablock = get_data(learning=True)
-        c_net, e_net, days_left = learning(datablock, c_net, e_net, days_left)
-    # Сеть уже обучилась
+# Рабочий режим
+def work_mode(em=False):
+    log('Started in work-mode')
+    c_net, e_net, days_left = load_net('neuronet.npy') # Загружаем сети и количество дней
     data = get_data()
-    if econom_mode_on(data):
-        result = econom(data, c_net, e_net)
-    else:
-        result = comfort(data, c_net)
-    ''' Отладка!!! '''
-    post_data([1,1,1])
-    #post_data(result)
+    if days_left > 0:
+        mode = 'econom-mode' if em else 'comfort-mode'
+        log('Failure! Trying to use non-trained net in ' + mode)
+        post_data(['Сбой! Попытка использовать необученную сеть.'])
+        halt()
+    result = econom(data, c_net, e_net) if em else comfort(data, c_net, e_net)
+    post_data(result)
     return
 
 def debug_mode():
-    post_data([1,1,1,1,1])
+    post_data(['R1', 'C1', 'R2', 'C2', 'R3', 'C3', 'R4', 'C4', 'R5', 'C5', 'G'])
     return
 
 # Выбор паттерна введённых параметров
 def pattern(param):
     return {
-        param == '--continue-mode' or param == '-cm': continue_mode,
-        param == '--learn-only-mode' or param == '-lom': learn_only_mode,
+        param == '--econom' or param == '-e': lambda: work_mode(True),
+        param == '--comfort' or param == '-c': lambda: work_mode(),
+        param == '--continue' or param == '-cm': continue_mode,
+        param == '--learn-only' or param == '-lo': learn_only_mode,
         param == '--debug' or param == '-d': debug_mode,
         param == '--help' or param == '-h': help_mode
     }[True]
