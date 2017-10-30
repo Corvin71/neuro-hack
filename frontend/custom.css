@@ -1,0 +1,55 @@
+.demo-1 .bar {
+    /* Size and position */
+    font-size: 20px; /* 1em */
+    width: 10em;
+    height: 1em;
+    position: relative;
+    margin: 100px auto;
+    display: none;
+
+    /* Styles */
+    border-radius: .5em; /* Height/2 */
+    background: white; /* Fallback */
+    background: rgba(255,255,255,0.6);
+    box-shadow:
+            0 0 0 .05em rgba(100,100,100,0.075), /* Subtle border */
+            0 0 0 .25em rgba(0,0,0,0.1), /* Outter border */
+            inset 0 .1em .05em rgba(0,0,0,0.1), /* Inset shadow */
+            0 .05em rgba(255,255,255,0.7); /* Slight reflection */
+}
+
+.demo-1 .bar:after {
+    /* Content and position */
+    content: "Расчет...";
+    position: absolute;
+    left: 30%;
+    top: 150%;
+
+    /* Font styles */
+    font-family: 'Carrois Gothic', sans-serif;
+    font-size: 1em;
+    color: #555;
+    text-shadow: 0 .05em rgba(255,255,255,0.7);
+}
+
+.demo-1 .sphere {
+    /* Size */
+    display: block;
+    width: 1em;
+    height: 100%;
+
+    /* Styles */
+    border-radius: 50%;
+    background: linear-gradient(#eee, #ddd);
+    box-shadow:
+            inset 0 .15em .1em rgba(255,255,255,0.3), /* Top light */
+            inset 0 -.1em .15em rgba(0,0,0,0.15), /* Bottom shadow */
+            0 0 .25em rgba(0,0,0,0.3); /* Outter shadow */
+
+    /* Animation */
+    animation: move 1.75s ease-in-out infinite alternate;
+}
+
+@keyframes move {
+    to { margin-left: 90%; }
+}
