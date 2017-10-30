@@ -13,8 +13,18 @@
 <body onload="SendGet()">
 <h2 align="center" class="title">Расположение комнат</h2>
 
-<div class="col-md-2"></div>
-<div class="col-md-8">
+<div class="col-md-5"></div>
+<div class="col-md-1">
+    <div class="can-toggle can-toggle--size-large">
+        <input id="c" type="checkbox">
+        <label for="c">
+            <div class="can-toggle__switch" data-checked="Вкл" data-unchecked="Выкл"></div>
+        </label>
+    </div>
+</div>
+<br><br>
+
+<div class="col-sm-10">
 <table class="table rooms table-striped table-bordered table-hover text-center" align="center">
 </table>
 </div>
