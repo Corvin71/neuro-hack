@@ -52,7 +52,7 @@ def optimize(temps, N, net):
 # Одна итерация обучения
 def learn_iter(x, y, net):
     ans = calc(x, net) # ans = {a1, a2} - выход сети. a1 - расход газа, a2 - электричества
-    u = layer1Ans(net[0], x) # u - выход 1 слоя
+    u = layer1Ans(net[0], x[:-1]) # u - выход 1 слоя
     p = layer2Ans(net[1], np.append(u, x[-1])) # p - выход 2 слоя
     
     mV = (net[1] != 0) + np.zeros(net[1].shape)
