@@ -18,12 +18,17 @@ def error(y_train, y_test):
 
 # Инициализация сети
 def init(N):
-    W = np.zeros(shape=(N, 3*N+1))
+    W = np.zeros(shape=(2*N, 3*N))
     for i in range(N):
-        for k in range(3):
-            W[i, 3*i+k] = rnd.random()
-    W[i, 3*(N-1)+3] = rnd.random()
-    V = np.random.rand(2,N)
+        W[2*i, 3*i] = rnd.random()
+        W[2*i, 3*i+2] = rnd.random()
+        W[2*i+1, 3*i+1] = rnd.random()
+        W[2*i+1, 3*i+2] = rnd.random()
+    V = np.zeros((2, 2*N+1))
+    for i in range(N):
+        V[0, 2*i] = rnd.random()
+        V[1, 2*i+1] = rnd.random()
+    V[1, 2*N] = rnd.random()
     return [W, V]
 
 # Вспомогательная функция для оптимизации. На вход получает массивы крутилок и температур
@@ -47,15 +52,22 @@ def optimize(temps, N, net):
 # Одна итерация обучения
 def learn_iter(x, y, net):
     ans = calc(x, net) # ans = {a1, a2} - выход сети. a1 - расход газа, a2 - электричества
-    u = layer1Ans(net[0], x) # u - выход 1 слоя БЕЗ ФУНКЦИИ АКТИВАЦИИ
+    u = layer1Ans(net[0], x) # u - выход 1 слоя
+    p = layer2Ans(net[1], np.append(u, x[-1])) # p - выход 2 слоя
+    
+    mV = (net[1] != 0) + np.zeros(net[1].shape)
+    mW = (net[0] != 0) + np.zeros(net[0].shape)
     # dV
-    dV = (2*(ans-y)*(((np.ones(net[1].shape).T * np.power(ans, 2)).T * f(u)).T * np.exp(-net[1].dot(f(u))))).T
+    dV = (np.power(f(p), 2)*np.exp(-p) * (np.ones(net[1].shape)).T).T * np.append(u, x[-1]) * mV
+    dV = (2*(ans-y)*dV.T).T
     # dW
-    Vs = np.average(net[1], axis=0) # матрица (вектор) V'
-    dW = np.power(f(Vs.dot(f(u))), 2)*np.exp(-Vs.dot(f(u)))*Vs*np.power(f(u), 2)*np.exp(-u)
-    dW = (2*np.average(ans-y)*np.ones(net[0].shape).T * dW).T * x
-    mW = (net[0]!=0) + np.zeros(net[0].shape) # маска элементов матрицы W
-    dW *= mW
+    dW = np.sum((np.power(f(p), 2)*np.exp(-p) * net[1].T), axis=1)
+    tmp = np.ones(net[0].shape) * x[:-1]
+    dW = (dW[:-1] * tmp.T).T * mW
+    df = np.zeros(net[1].shape[0])
+    df[0::2] = 2*(ans-y)[0]
+    df[1::2] = 2*(ans-y)[1]
+    dW = (dW.T * df).T
     
     return [dW, dV]
 
@@ -73,4 +85,4 @@ def learn_epoch(x, y, net):
 
 # Расчёт по нейронной сети
 def calc(datapiece, net):
-    return f(layer2Ans(net[1], f(layer1Ans(net[0], np.array(datapiece)))))
+    return f(layer2Ans(net[1], np.append(layer1Ans(net[0], datapiece[:-1]), datapiece[-1])))
