@@ -73,7 +73,7 @@
     height: 50px;
     -webkit-flex: 0 0 160px;
     -ms-flex: 0 0 160px;
-    flex: 0 0 160px;
+    flex: 0 0 163px;
     border-radius: 4px;
 }
 .can-toggle.can-toggle--size-large label .can-toggle__switch:before {
@@ -81,14 +81,14 @@
     font-size: 14px;
     line-height: 50px;
     width: 80px;
-    padding: 0 12px;
+    padding: 0 5px;
 }
 .can-toggle.can-toggle--size-large label .can-toggle__switch:after {
     top: 2px;
     left: 2px;
     border-radius: 2px;
-    width: 78px;
-    line-height: 46px;
+    width: 80px;
+    line-height: 45px;
     font-size: 14px;
 }
 .can-toggle.can-toggle--size-large label .can-toggle__switch:hover:after {
@@ -179,8 +179,6 @@
 .can-toggle input[type="checkbox"]:checked ~ label .can-toggle__switch {
     background-color: #70c767;
 }
-
-
 
 
 .can-toggle label .can-toggle__switch {
