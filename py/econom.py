@@ -1,16 +1,20 @@
-﻿# -*- coding: UTF-8 -*-
+# -*- coding: UTF-8 -*-
 import numpy as np
 import random as rnd
 from scipy.optimize import minimize
 
 def f(x):
-    return 1/(1+np.exp(-x))
+    return 1 / (1 + np.exp(-x))
 
 def layer1Ans(W, x):
     return W.dot(x)
 
 def layer2Ans(V, x):
     return V.dot(x)
+
+# Функция ошибки
+def error(y_train, y_test):
+    return np.average(np.power(y_train - y_test, 2))
 
 # Инициализация сети
 def init(N):
@@ -35,7 +39,7 @@ def g(twisters, temps, net):
 
 # Функция оптимизации, возвращает показания крутилок в [0, 1].
 # Формат выхода: [Р1 К1 Р2 К2 ... Рn Кn Г]
-def optimize(temps, net):
+def optimize(temps, N, net):
     bounds = np.c_[np.zeros(2*N+1), np.ones(2*N+1)]
     res = minimize(g, np.zeros(2*N+1), args=(temps,net,), bounds=bounds, tol=1e-10)
     return res.x

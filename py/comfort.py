@@ -1,10 +1,14 @@
-﻿# -*- coding: UTF-8 -*-
+# -*- coding: UTF-8 -*-
 import numpy as np
 import random as rnd
 
 # Функция активации
 def f(x):
     return 1.0 / (1.0 + np.exp(-x))
+
+# Функция ошибки
+def error(y_train, y_test):
+    return np.average(np.power(y_train - y_test, 2))
 
 # Инициализация сети
 def init(N):

@@ -43,9 +43,19 @@ def post_data(result):
 def learning(datablock, c_net, e_net, days_left):
     Xc, Yc = to_c_blocks(datablock)
     Xe, Ye = to_e_blocks(datablock)
-    c_net = c.learn_epoch(Xc, Yc, c_net)
-    e_net = e.learn_epoch(Xe, Ye, e_net)
+    # Расчёт оптимизатора
+    print 'Optimization before learning (for middle): '
+    print e.optimize([Xc[20][i] for i in range(1, len(Xc[0]), 2)], 5, e_net)
+    # Расчёт ошибок
+    c_err, e_err = 0, 0
+    for i in range(len(Xc)):
+        c_err += c.error(c.calc(Xc[i], c_net), Yc[i])
+        e_err += e.error(e.calc(Xe[i], e_net), Ye[i])
+    c_err /= len(Xc)
+    e_err /= len(Xe)
     days_left -= 1
+    # Логгирование и сохранение
+    log('Epoch complete. Errors: comfort: ' + str(c_err) + '; econom: ' + str(e_err) + '. Left (days): ' + str(days_left))
     save_net(c_net, e_net, days_left) # Сохранение данных каждый день
     if days_left != 0:
         await()
@@ -69,7 +79,7 @@ def econom(datapiece, c_net, e_net):
 def save_net(c_net, e_net, days_left):
     with open('neuronet.npy', 'wb') as f:
         np.save(f, np.array([c_net, e_net, days_left]))
-    log('Epoch complete. Left (days): ' + str(days_left))
+    log('Saved')
     return
 
 # Загружает сети и количество (из файла или с сервера)
@@ -136,10 +146,6 @@ def to_e_blocks(datablock):
     return x, y
 
 ''' Служебное '''
-# Определяет, включен ли режим "Эконом"
-def econom_mode_on(datapiece):
-    return datapiece[0] == 0
-
 # Ожидание данных
 def await():
     tm = 5
@@ -154,11 +160,12 @@ def log(message):
     print message
     with open('logs.log', 'a') as log:
         log.write(message + '\n')
+    return
 
 # Завершение работы
-def halt():
+'''def halt():
     log('Halt')
-    raise SystemExit
+    raise SystemExit'''
 
 ''' Параметры командной строки '''
 # Инициализация системы
@@ -197,12 +204,21 @@ def work_mode(em=False):
         mode = 'econom-mode' if em else 'comfort-mode'
         log('Failure! Trying to use non-trained net in ' + mode)
         post_data(['Сбой! Попытка использовать необученную сеть.'])
-        halt()
+        return
     result = econom(data, c_net, e_net) if em else comfort(data, c_net, e_net)
     post_data(result)
     return
 
 def debug_mode():
+    log('Started in debug-mode')
+    c_net, e_net, days_left = initialization()
+    while days_left > 0:
+        day = d.date(2017, 10, 11)
+        datablock = get_data(learning=True, day=day)
+        day += timedelta(days=1)
+        c_net, e_net, days_left = learning(datablock, c_net, e_net, days_left)
+        log('Days left: ' + str(days_left))
+    log('Successfully learned')
     post_data(['R1', 'C1', 'R2', 'C2', 'R3', 'C3', 'R4', 'C4', 'R5', 'C5', 'G'])
     return
 
@@ -239,7 +255,7 @@ def debug():
         while True:
             # Основной цикл программы
             if days_left == 0:
-                halt() # Отладка!!!
+                #halt() # Отладка!!!
                 data = get_data(False)
                 if data == []:
                     return
