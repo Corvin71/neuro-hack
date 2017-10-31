@@ -10,6 +10,7 @@ import comfort as c
 import econom as e
 address = 'http://corvin71.ddns.net'
 path = '/smartHack/Server/data_collection.php'
+answer = '/smartHack/Server/answer.php'
 is_learning = '?is_learning='
 rooms = '?how_rooms=1'
 save = ''
@@ -34,7 +35,7 @@ def get_data(learning=False, day=d.datetime.today().date()):
 # Загружает полученную информацию на сервер
 def post_data(result):
     postData = "ans=" + str(result)
-    request = u2.Request(address + path, postData)
+    request = u2.Request(address + answer, postData)
     response = u2.urlopen(request)
     return
 
@@ -223,7 +224,7 @@ def debug_mode():
         c_net, e_net, days_left = learning(datablock, c_net, e_net, days_left)
         log('Days left: ' + str(days_left))
     log('Successfully learned')
-    post_data(['R1', 'C1', 'R2', 'C2', 'R3', 'C3', 'R4', 'C4', 'R5', 'C5', 'G'])
+    post_data([1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 0])
     return
 
 # Выбор паттерна введённых параметров
@@ -243,6 +244,7 @@ def help_mode():
     return
 
 ''' Главная функция '''
+'''
 def debug():
     if __name__ == "__main__":
 
@@ -276,3 +278,4 @@ def debug():
                     return
                 c_net, e_net, days_left = learning(data, c_net, e_net, days_left)
     return
+'''
