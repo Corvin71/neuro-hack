@@ -36,6 +36,7 @@ def post_data(result):
     postData = "ans=" + str(result)
     request = u2.Request(address + path, postData)
     response = u2.urlopen(request)
+    return
 
 ''' Обучение и эксплуатация нейронок '''
 # Вызывается, когда нужно обучить сеть.
@@ -43,9 +44,12 @@ def post_data(result):
 def learning(datablock, c_net, e_net, days_left):
     Xc, Yc = to_c_blocks(datablock)
     Xe, Ye = to_e_blocks(datablock)
+    c_net = c.learn_epoch(Xc, Yc, c_net)
+    e_net = e.learn_epoch(Xe, Ye, e_net)
     # Расчёт оптимизатора
     print 'Optimization before learning (for middle): '
-    print e.optimize([Xc[20][i] for i in range(1, len(Xc[0]), 2)], 5, e_net)
+    print e.optimize([1, 1, 1, 1, 1], 5, e_net)
+    #print e.optimize([Xc[20][i] for i in range(1, len(Xc[0]), 2)], 5, e_net)
     # Расчёт ошибок
     c_err, e_err = 0, 0
     for i in range(len(Xc)):
@@ -250,7 +254,6 @@ def debug():
             combine_mode()
             
     else:
-        ''' ОТЛАДКА!!! '''
         c_net, e_net, days_left = initialization()
         while True:
             # Основной цикл программы
