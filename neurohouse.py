@@ -1,7 +1,6 @@
 ﻿import sys
 import codecs
 from py.general import pattern
-from py.general import debug
 from py.general import post_data
 
 def main():

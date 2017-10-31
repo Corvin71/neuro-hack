@@ -40,7 +40,16 @@ function Test(me) {
         me.value = 't';
     }
 
-    $.get("Server/data_collection.php?state_neuron=" + me.value + "&id_room=" + me.id, function(data){
+    //Проверка переключателя.
+    _elSwitchMode = document.getElementById("c");
+    _state = '';
+
+    if (_elSwitchMode.checked)
+        _state = 't';
+    else
+        _state = 'f';
+
+    $.get("Server/data_collection.php?state_neuron=" + me.value + "&state_mode=" + _state, function(data){
         document.getElementById(("loads" + me.id).toString()).style.display = "none";
         $("#inf" + me.id).html(data)
     });

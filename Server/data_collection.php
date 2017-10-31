@@ -94,26 +94,30 @@ if (isset($_GET["how_rooms"]))
 //Запрос комнат с названиями и идентификаторами в JSON-формате.
 if (isset($_GET["get_rooms"]))
 {
-	$result = array();
+	$result      = array();
 	$amountRooms = _sql("SELECT * FROM public.rooms WHERE name NOT LIKE 'Бойлерная'");
 	for ($i = 0; $i < count($amountRooms); $i++)
 	{
 		$result[$i] = $amountRooms[$i]["name"];
 	}
-	
+
 	echo json_encode($result, JSON_UNESCAPED_UNICODE);
 }
 
 //Запускает или останавливает нейросеть.
-if (isset($_GET["state_neuron"]) && isset($_GET["id_room"])) {
-		exec("python ../neurohouse.py -cm");
-		$res = _sql("SELECT * FROM public.logs ORDER BY date DESC LIMIT 1");
-		echo $res[0]["log"] ."   " .$res[0]["date"];
-}
+if (isset($_GET["state_neuron"]) && isset($_GET["state_mode"]))
+{
+	if ($_GET["state_mode"] == 't')
+	{
+		exec("python ../neurohouse.py -e");
+	}
+	else
+	{
+		exec("python ../neurohouse.py -c");
+	}
 
-if(isset($_POST["ans"])) {
-	_sql("INSERT INTO public.logs(log) VALUES ('" . $_POST["ans"] . "')");
-	$answer = $_POST["ans"];
+	$res = _sql("SELECT * FROM public.logs ORDER BY date DESC LIMIT 1");
+	echo $res[0]["log"] . "   " . $res[0]["date"];
 }
 
 //Запись логов в базу данных.
