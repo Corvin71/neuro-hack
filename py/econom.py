@@ -44,9 +44,15 @@ def g(twisters, temps, net):
 
 # Функция оптимизации, возвращает показания крутилок в [0, 1].
 # Формат выхода: [Р1 К1 Р2 К2 ... Рn Кn Г]
-def optimize(temps, N, net):
+def optimize(temps, N, net, c_res):
     bounds = np.c_[np.zeros(2*N+1), np.ones(2*N+1)]
-    res = minimize(g, np.zeros(2*N+1), args=(temps,net,), bounds=bounds, tol=1e-10)
+    con = {
+        'type': 'ineq',
+        'fun': lambda x: -np.max(abs(x - c_res)) + 0.04
+        }
+    res = minimize(g, np.zeros(2*N+1), args=(temps,net,), bounds=bounds, tol=1e-3, constraints=con)
+    print res.success
+    print res.message
     return res.x
 
 # Одна итерация обучения
@@ -64,7 +70,7 @@ def learn_iter(x, y, net):
     dW = np.sum((np.power(f(p), 2)*np.exp(-p) * net[1].T), axis=1)
     tmp = np.ones(net[0].shape) * x[:-1]
     dW = (dW[:-1] * tmp.T).T * mW
-    df = np.zeros(net[1].shape[0])
+    df = np.zeros(net[0].shape[0])
     df[0::2] = 2*(ans-y)[0]
     df[1::2] = 2*(ans-y)[1]
     dW = (dW.T * df).T

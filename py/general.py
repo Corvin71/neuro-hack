@@ -49,8 +49,8 @@ def learning(datablock, c_net, e_net, days_left):
     e_net = e.learn_epoch(Xe, Ye, e_net)
     # Расчёт оптимизатора
     print 'Optimization before learning (for middle): '
-    print e.optimize([1, 1, 1, 1, 1], 5, e_net)
-    #print e.optimize([Xc[20][i] for i in range(1, len(Xc[0]), 2)], 5, e_net)
+    c_res = np.append(c.calc(Xc[30], c_net), datablock[30][2])
+    print e.optimize([Xc[30][i] for i in range(1, len(Xc[0]), 2)], 5, e_net, c_res)
     # Расчёт ошибок
     c_err, e_err = 0, 0
     for i in range(len(Xc)):
@@ -222,7 +222,6 @@ def debug_mode():
         datablock = get_data(learning=True, day=day)
         day += timedelta(days=1)
         c_net, e_net, days_left = learning(datablock, c_net, e_net, days_left)
-        log('Days left: ' + str(days_left))
     log('Successfully learned')
     post_data([1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 0])
     return
