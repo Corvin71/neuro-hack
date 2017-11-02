@@ -2,8 +2,10 @@ var text = 'Войти в комнату';
 var text2 = 'Выйти из комнаты';
 var check = true;
 var stateTimer = false;
-var Temperature = 0;
+var temperature = [];
 
+var countOfActiveRooms = 0;
+var timerID = 0;
 
 function SendGet() {
     $.getJSON("Server/data_collection.php?get_rooms=1", function (data) {
@@ -16,12 +18,44 @@ function SendGet() {
                 "<div id='inf" + parseInt(key + 1) + "_1" +"'>Показания нейросети" + "</div>" +
                 "</div>" + "</td>" +
                 "<td>" +
-                "<input id='inp" + parseInt(key + 1) + "_1" + "' type='range' min='0' max='45' step='0.1' value='19' oninput='OnInput(this)'><br><span id='spn" + parseInt(key + 1) + "_1" +  "'></span></td>" +
+                "<input class='slid' id='inp" + parseInt(key + 1) + "_1" + "' type='range' min='0' max='45' step='0.1' value='19' oninput='OnInput(this)'><br><span id='spn" + parseInt(key + 1) + "_1" +  "'></span></td>" +
                 "<td><button class='btn btn-info' id='" + parseInt(key + 1) + "_1" + "' onclick='Test(this)'>Войти в комнату</button></td></tr>";
+                temperature.push(0);
         });
-        items += "<tr><td>Бойлерная (положение ручки бойлера)</td><td colspan='3'><input id='gas' type='range' min='0' max='1' step='0.01' value='0.3' oninput='OnInputGas(this)'><span id='spnGas'>" +
+        items += "<tr><td>Бойлерная (положение ручки бойлера)</td><td colspan='3'><input id='gas' class='gaas' type='range' min='0' max='1' step='0.01' value='0.3' oninput='OnInputGas(this)'><span id='spnGas'>" +
             "</span></td></tr>";
         $(".rooms").html(items)
+    });
+}
+
+function getNetResult(me) {
+    //Проверка переключателя.
+    _elSwitchMode = document.getElementById("c");
+    _is_econom = '';
+
+    if (_elSwitchMode.checked)
+        _is_econom = 't';
+    else
+        _is_econom = 'f';
+    
+    // Формируем строку запроса
+    var request = "Server/data_collection.php?p=";
+    $('.btn').each(function(i, elem) {
+        request += elem.value !== '' ? elem.value + ',' : 't,';
+    });
+    request = request.substr(0, request.length - 1) + '&t=';
+    $('.slid').each(function(i, elem) {
+        request += elem.value - temperature[i] + ',';
+        temperature[i] = elem.value;
+    });
+    request = request.substr(0, request.length - 1);
+    //alert(request);
+    request += '&g=' + document.getElementById('gas').value;
+    alert(request);
+
+    $.get(request, function(data){
+        document.getElementById(("loads" + me.id).toString()).style.display = "none";
+        $("#inf" + me.id).html(data)
     });
 }
 
@@ -32,61 +66,57 @@ function Test(me) {
 
     me.disable = true;
     if ((me.value === "t") || (me.value === "")) {
+        // Осуществляется вход в комнату
         me.classList.remove("btn-info");
         me.classList.add("btn-warning");
         me.innerText = text2;
         me.value = 'f';
+        countOfActiveRooms++;
     }
     else {
+        // Осуществляется выход из комнаты
         me.classList.remove("btn-warning");
         me.classList.add("btn-info");
         me.innerText = text;
         check = true;
         me.value = 't';
+        countOfActiveRooms--;
     }
 
-    //Проверка переключателя.
-    _elSwitchMode = document.getElementById("c");
-    _state = '';
-
-    if (_elSwitchMode.checked)
-        _state = 't';
-    else
-        _state = 'f';
-
     //Запуск таймера.
-    StartTimer(me, _state);
+    if(countOfActiveRooms > 0)
+        StartTimer(me);
+    else
+        StopTimer();
 
-    $.get("Server/data_collection.php?state_neuron=" + me.value + "&state_mode=" + _state, function(data){
+    /*$.get("Server/data_collection.php?state_neuron=" + me.value + "&is_econom=" + _state, function(data){
         document.getElementById(("loads" + me.id).toString()).style.display = "none";
         $("#inf" + me.id).html(data)
-    });
-
+    }); */
     me.disable = false;
 }
 
 function OnInput(item) {
     var _realId = (item.id.substr(3, item.id.length));
-    document.getElementById(('spn' + _realId).toString()).innerText = (document.getElementById(item.id).value +" °C").toString();
+    document.getElementById(('spn' + _realId).toString()).innerText = (document.getElementById(item.id).value +"°C").toString();
 }
 
 function OnInputGas(item) {
     document.getElementById(('spnGas').toString()).innerText = (document.getElementById(item.id).value).toString();
 }
 
-function StartTimer(_el, state) {
+function StartTimer(me) {
     if (!stateTimer) {
-        setInterval(function () {
-            var startTemperature = document.getElementById('inp' + _el.id).value;
-
-            $.get("Server/data_collection.php?state_neuron=" + _el.value + "&state_mode=" + state + "&startTemp=" + startTemperature +
-                "&room_id=" + me.id.substr(2, me.id.length), function(data){
-                document.getElementById(("loads" + me.id).toString()).style.display = "none";
-                $("#inf" + me.id).html(data)
-            });
+        timerID = setInterval(function () {
+            getNetResult(me);
         }, 6000);
 
         stateTimer = !stateTimer;
     }
 }
 
+function StopTimer() {
+    if(timerID !== 0) {
+        clearInterval(timerID);
+    }
+}

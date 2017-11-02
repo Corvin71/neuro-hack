@@ -125,6 +125,10 @@ if (isset($_GET["state_neuron"]) && isset($_GET["state_mode"]))
 	echo $res[0]["log"] . "   " . $res[0]["date"];
 }
 
+//TODO - сделать принятие параметров get: p, g, t
+//Server/data_collection.php?p=f,t,t,t,t&s=19,19,19,19,19&g=0.3
+//if
+
 //Запись логов в базу данных.
 if (isset($_POST["log"]) && ($_POST["log"] != ""))
 {
