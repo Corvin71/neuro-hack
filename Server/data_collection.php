@@ -107,6 +107,11 @@ if (isset($_GET["get_rooms"]))
 //Запускает или останавливает нейросеть.
 if (isset($_GET["state_neuron"]) && isset($_GET["state_mode"]))
 {
+	//Если пришла стартовая температура, то генерация новой выборки (эмуляция работы датчиков).
+	if (isset($_GET["startTemp"]) && isset($_GET["room_id"])) {
+
+	}
+
 	if ($_GET["state_mode"] == 't')
 	{
 		exec("python ../neurohouse.py -e");
