@@ -49,9 +49,9 @@ def learning(datablock, c_net, e_net, days_left):
     e_net = e.learn_epoch(Xe, Ye, e_net)
     # Расчёт оптимизатора ВЫКИНУТЬ ИЗ РЕЛИЗА!
     print 'Optimization before learning (for middle): '
-    c_res = np.append(c.calc(Xc[30], c_net), datablock[30][2])
-    temp = [Xc[30][i] for i in range(2, len(Xc[0]), 2)]
-    print e.optimize(temp, count_of_rooms(datablock), e_net, c_res)
+    temps = [Xc[30][i] for i in range(2, len(Xc[0]), 2)]
+    params = [Xc[30][0]] + [Xc[30][i] for i in range(3, len(Xc[0]), 2)]
+    print e.optimize(temps, count_of_rooms(datablock[0]), e_net, c_net, params)
     # Расчёт ошибок
     c_err, e_err = 0, 0
     for i in range(len(Xc)):
@@ -67,12 +67,6 @@ def learning(datablock, c_net, e_net, days_left):
         await()
     return c_net, e_net, days_left
 
-# Вызывается для режима "Эконом"
-def optimization(datapiece, c_res, e_net):
-    c_res_ex = np.append(c_res, datapiece[2])
-    temps = [datapiece[i] for i in range(2, len(datapiece), 2)]
-    return e.optimize(temps, count_of_rooms(datapiece), e_net, c_res_ex)
-
 # Возвращает вектор крутилок при поддержании режима "Комфорт"
 def comfort(datapiece, c_net):
     log('Task for comfort-mode')
@@ -82,11 +76,9 @@ def comfort(datapiece, c_net):
 # Возвращает вектор крутилок при поддержании режима "Эконом"
 def econom(datapiece, c_net, e_net):
     log('Task for econom-mode')
-    x_c = to_work_c_block(datapiece)
-    c_res = c.calc(x_c, c_net)
-    '''x_e = to_work_e_block(datapiece, c_res)
-    e_res = e.calc(c_res, e_net)'''
-    e_res = optimization(datapiece, c_res, e_net)
+    temps = [datapiece[i] for i in range(2, len(datapiece), 2)]
+    params = [datapiece[0]] + [datapiece[i] for i in range(3, len(datapiece), 2)]
+    e_res = e.optimize(temps, count_of_rooms(datapiece), e_net, c_net, params)
     return e_res
 
 ''' Запись и загрузка нейронок '''
@@ -163,7 +155,7 @@ def to_e_blocks(datablock):
 ''' Служебное '''
 # Получить количество комнат по выборке
 def count_of_rooms(datablock):
-    return int(len(datablock[0][3:]) / 5)
+    return int(len(datablock[3:]) / 5)
 
 # Ожидание данных
 def await():

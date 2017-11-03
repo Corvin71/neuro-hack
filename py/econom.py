@@ -45,17 +45,17 @@ def g(twisters, temps, net):
 
 # Функция оптимизации, возвращает показания крутилок в [0, 1].
 # Формат выхода: [Р1 К1 Р2 К2 ... Рn Кn Г]
-def optimize(temps, N, net, c_net, params):
+def optimize(temps, N, e_net, c_net, params):
     # params - вектор доп. параметров: [T p1 p2 ... pn], T - время суток, pi - присутствие
     bounds = np.c_[np.zeros(2*N+1), np.ones(2*N+1)]
-    v = np.zeros(len(T) + len(params))
+    v = np.zeros(len(temps) + len(params))
     v[0::2] = params
-    v[1::2] = T
+    v[1::2] = temps
     con = {
         'type': 'ineq',
         'fun': lambda x: -np.max(abs(x - np.append(cm.calc(np.insert(v, 1, x[-1]), c_net), x[-1]))) + 0.04
         }
-    res = minimize(g, np.zeros(2*N+1), args=(temps, net), bounds=bounds, tol=1e-3, constraints=con)
+    res = minimize(g, np.zeros(2*N+1), args=(temps, e_net), bounds=bounds, tol=1e-3, constraints=con)
     print res.success
     print res.message
     return res.x
