@@ -50,7 +50,7 @@ def optimize(temps, N, net, c_res):
         'type': 'ineq',
         'fun': lambda x: -np.max(abs(x - c_res)) + 0.04
         }
-    res = minimize(g, np.zeros(2*N+1), args=(temps,net,), bounds=bounds, tol=1e-3, constraints=con)
+    res = minimize(g, np.zeros(2*N+1), args=(temps, net), bounds=bounds, tol=1e-3, constraints=con)
     print res.success
     print res.message
     return res.x

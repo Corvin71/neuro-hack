@@ -47,10 +47,11 @@ def learning(datablock, c_net, e_net, days_left):
     Xe, Ye = to_e_blocks(datablock)
     c_net = c.learn_epoch(Xc, Yc, c_net)
     e_net = e.learn_epoch(Xe, Ye, e_net)
-    # Расчёт оптимизатора
+    # Расчёт оптимизатора ВЫКИНУТЬ ИЗ РЕЛИЗА!
     print 'Optimization before learning (for middle): '
     c_res = np.append(c.calc(Xc[30], c_net), datablock[30][2])
-    print e.optimize([Xc[30][i] for i in range(1, len(Xc[0]), 2)], 5, e_net, c_res)
+    temp = [Xc[30][i] for i in range(2, len(Xc[0]), 2)]
+    print e.optimize(temp, count_of_rooms(datablock), e_net, c_res)
     # Расчёт ошибок
     c_err, e_err = 0, 0
     for i in range(len(Xc)):
@@ -66,17 +67,26 @@ def learning(datablock, c_net, e_net, days_left):
         await()
     return c_net, e_net, days_left
 
+# Вызывается для режима "Эконом"
+def optimization(datapiece, c_res, e_net):
+    c_res_ex = np.append(c_res, datapiece[2])
+    temps = [datapiece[i] for i in range(2, len(datapiece), 2)]
+    return e.optimize(temps, count_of_rooms(datapiece), e_net, c_res_ex)
+
 # Возвращает вектор крутилок при поддержании режима "Комфорт"
 def comfort(datapiece, c_net):
+    log('Task for comfort-mode')
     x, y = to_c_block(datapiece)
     return c.calc(x, c_net)
 
 # Возвращает вектор крутилок при поддержании режима "Эконом"
 def econom(datapiece, c_net, e_net):
+    log('Task for econom-mode')
     x_c = to_work_c_block(datapiece)
     c_res = c.calc(x_c, c_net)
-    x_e = to_work_e_block(datapiece, c_res)
-    e_res = e.calc(c_res, e_net)
+    '''x_e = to_work_e_block(datapiece, c_res)
+    e_res = e.calc(c_res, e_net)'''
+    e_res = optimization(datapiece, c_res, e_net)
     return e_res
 
 ''' Запись и загрузка нейронок '''
@@ -119,15 +129,15 @@ def to_c_blocks(datablock):
     x = []
     y = []
     for datapiece in datablock:
-        temp_x = [datapiece[0]]
+        temp_x = [datapiece[0], datapiece[2]] # Прикручиваем время суток и крутилку газа
         for i in range(3, len(datapiece), 5):
-            temp_x.append(datapiece[i])
-            temp_x.append(datapiece[i + 1])
+            temp_x.append(datapiece[i])       # Докидываем температуру
+            temp_x.append(datapiece[i + 1])   # и присутствие
         x.append(temp_x)
         temp_y = []
         for i in range(5, len(datapiece), 5):
-            temp_y.append(datapiece[i])
-            temp_y.append(datapiece[i + 1])
+            temp_y.append(datapiece[i])       # Присобачиваем крутилку кондиционера
+            temp_y.append(datapiece[i + 1])   # и крутилку радиатора
         y.append(temp_y)
     return x, y
 
@@ -138,19 +148,23 @@ def to_e_blocks(datablock):
     for datapiece in datablock:
         temp_x = []
         for i in range(3, len(datapiece), 5):
-            temp_x.append(datapiece[i])
-            temp_x.append(datapiece[i + 3])
-            temp_x.append(datapiece[i + 2])
-        temp_x.append(datapiece[2])
+            temp_x.append(datapiece[i + 3]) # Привинчиваем крутилку радиатора
+            temp_x.append(datapiece[i + 2]) # Присасываем крутилку кондиционера
+            temp_x.append(datapiece[i])     # Присобачиваем температуру
+        temp_x.append(datapiece[2])         # Докидываем крутилку газа
         x.append(temp_x)
         s = 0
         for i in range(7, len(datapiece), 5):
-            s += datapiece[i]
-        temp_y = [datapiece[1], s]
+            s += datapiece[i]               # Находим сумму энергий
+        temp_y = [datapiece[1], s]          # и докидываем расходы
         y.append(temp_y)
     return x, y
 
 ''' Служебное '''
+# Получить количество комнат по выборке
+def count_of_rooms(datablock):
+    return int(len(datablock[0][3:]) / 5)
+
 # Ожидание данных
 def await():
     tm = 5
@@ -166,11 +180,6 @@ def log(message):
     with open('logs.log', 'a') as log:
         log.write(message + '\n')
     return
-
-# Завершение работы
-'''def halt():
-    log('Halt')
-    raise SystemExit'''
 
 ''' Параметры командной строки '''
 # Инициализация системы
@@ -214,6 +223,7 @@ def work_mode(em=False):
     post_data(result)
     return
 
+# Режим отладки
 def debug_mode():
     log('Started in debug-mode')
     c_net, e_net, days_left = initialization()
@@ -241,40 +251,3 @@ def pattern(param):
 def help_mode():
     print "9 HE CyMEJI IIO4uHuTb KOguPOBKy, TAK 4TO COCHuTE XEP - CIIPABKu HE 6ygET!"
     return
-
-''' Главная функция '''
-'''
-def debug():
-    if __name__ == "__main__":
-
-        # ЭТОТ КОД НЕ ВЫПОЛНЯЕТСЯ! ЭТА ФУНКЦИЯ ПОДЛЕЖИТ УДАЛЕНИЮ!
-        if len(sys.argv) > 1:
-            pattern(sys.argv[1])()
-        else:
-            c_net, e_net, days_left = initialization()
-            combine_mode()
-            
-    else:
-        c_net, e_net, days_left = initialization()
-        while True:
-            # Основной цикл программы
-            if days_left == 0:
-                #halt() # Отладка!!!
-                data = get_data(False)
-                if data == []:
-                    return
-                if econom_mode_on(d):
-                    result = econom(data, c_net, e_net)
-                else:
-                    result = comfort(data, c_net)
-                post_data(result)
-            else:
-                # Обучение
-                day = d.date(2017, 10, 11) # Отладка!!!
-                data = get_data(True, day)
-                day += timedelta(days=1) # Отладка!!!
-                if data == []:
-                    return
-                c_net, e_net, days_left = learning(data, c_net, e_net, days_left)
-    return
-'''

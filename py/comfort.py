@@ -12,14 +12,15 @@ def error(y_train, y_test):
 
 # Инициализация сети
 def init(N):
-    W = np.zeros(shape=(2*N, 2*N + 1))
+    W = np.zeros(shape=(2*N, 2*N + 2))
     for i in range(2*N):
         W[i][0] = rnd.random()
-    for i in range(1, 2*N, 2):
+        W[i][1] = rnd.random()
+    for i in range(2, 2*N, 2):
+        W[i - 2][i] = rnd.random()
         W[i - 1][i] = rnd.random()
-        W[i][i] = rnd.random()
+        W[i - 2][i + 1] = rnd.random()
         W[i - 1][i + 1] = rnd.random()
-        W[i][i + 1] = rnd.random()
     return W
 
 # Одна итерация обучения

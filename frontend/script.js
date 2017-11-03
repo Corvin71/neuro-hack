@@ -29,15 +29,6 @@ function SendGet() {
 }
 
 function getNetResult(me) {
-    //Проверка переключателя.
-    /*_elSwitchMode = document.getElementById("c");
-    _is_econom = '';
-
-    if (_elSwitchMode.checked)
-        _is_econom = 't';
-    else
-        _is_econom = 'f';*/
-    
     // Формируем строку запроса
     var request = "Server/data_collection.php?p=";
     $('.btn').each(function(i, elem) {
@@ -55,9 +46,20 @@ function getNetResult(me) {
         request += '&is_econom=1';
     }
 
-    $.getJSON(request, function(data){
+    $.getJSON(request, function(data) {
+        var j = 1;
+        var temp = '';
+        if ($("#c")[0].checked && data.length % 2 != 0) {
+            $("#gas")[0].value = data[data.length - 1];
+            $("#spnGas").text(data[data.length - 1]);
+        }
         $.each(data, function(i, item) {
-            $("#inf" + (i + 1) + "_1").html(item);
+            temp += item + '; ';
+            if(i % 2 != 0) {
+                $("#inf" + j + "_1").html(temp);
+                temp = '';
+                j++;
+            }
         });
     });
 }

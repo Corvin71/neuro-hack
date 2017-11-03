@@ -159,11 +159,15 @@ if(isset($_GET["p"]) && isset($_GET["t"]) && isset($_GET["g"])) {
 		//Вставка значений температуры.
 		$temperature = $arrayTemperature[$key];
 		$sensorID = $arraySensors[searchArrayFirstKey($arraySensors, "Температура" .$room)]["id_sensor"];
-		_sql("INSERT INTO public.status_sensors(sensor_id, celsium, date, room_id) VALUES('" .$sensorID ."', '" .$temperature ."', '" .$date ."', " .$room .")");
+		
+		// РАСКОММЕНТИРОВАТЬ ЗАПРОС!
+		//_sql("INSERT INTO public.status_sensors(sensor_id, celsium, date, room_id) VALUES('" .$sensorID ."', '" .$temperature ."', '" .$date ."', " .$room .")");
 	}
 	//Вставка крутилки газа.
 	$sensorID = $arraySensors[searchArrayFirstKey($arraySensors, "ЗадвижкаБойлера")]["id_sensor"];
-	_sql("INSERT INTO public.status_sensors(sensor_id, twister_gas, date, room_id) VALUES('" .$sensorID ."', '" .$gas ."', '" .$date ."', 6)");
+	
+	// РАСКОММЕНТИРОВАТЬ ЗАПРОС!
+	//_sql("INSERT INTO public.status_sensors(sensor_id, twister_gas, date, room_id) VALUES('" .$sensorID ."', '" .$gas ."', '" .$date ."', 6)");
 
 	if($_GET["is_econom"])
 	{
@@ -181,6 +185,6 @@ if(isset($_GET["p"]) && isset($_GET["t"]) && isset($_GET["g"])) {
 	// SELECT!!!
 	// и возвращаем в json'е
 	$result = _sql("SELECT * FROM public.logs ORDER BY date DESC LIMIT 1");
-
-	echo json_encode($result[0]["log"], JSON_UNESCAPED_UNICODE);
+	$answer = json_decode($result[0]["log"]);
+	echo json_encode($answer, JSON_UNESCAPED_UNICODE);
 }
