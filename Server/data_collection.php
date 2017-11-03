@@ -125,9 +125,7 @@ if (isset($_GET["get_rooms"]))
 	echo $res[0]["log"] . "   " . $res[0]["date"];
 }
 
-//TODO - сделать принятие параметров get: p, g, t
-//Server/data_collection.php?p=f,t,t,t,t&s=19,19,19,19,19&g=0.3
-//if
+
 
 //Запись логов в базу данных.
 if (isset($_POST["log"]) && ($_POST["log"] != ""))
@@ -135,10 +133,37 @@ if (isset($_POST["log"]) && ($_POST["log"] != ""))
 	_sql("INSERT INTO public.logs(log) VALUES ('" . $_POST["log"] . "')");
 }
 */
+//TODO - сделать принятие параметров get: p, g, t
+// p - массив присутствия, t - температуры, g - крутилка газа.
+//Server/data_collection.php?p=f,t,t,t,t&t=19,19,19,19,19&g=0.3
+//if
+
 
 if(isset($_GET["p"]) && isset($_GET["t"]) && isset($_GET["g"])) {
 	// Здесь показания кладутся в базу данных
 	// INSERT!!!
+	$arrayMoves = explode(",", $_GET["p"]);
+	$arrayTemperature = explode(",", $_GET["t"]);
+	$gas = $_GET["g"];
+	$arraySensors = _sql("SELECT * FROM public.sensors");
+
+	$date = "";
+	foreach ($arrayMoves as $key => $value) {
+		//Вставка значений датчика присутствия.
+		$moves = $value == "f" ? "1" : "0";
+		$room = $key + 1;
+		$date = date("d.m.Y H:i:s");
+		$sensorID = $arraySensors[searchArrayFirstKey($arraySensors, "Движение" .$room)]["id_sensor"];
+		_sql("INSERT INTO public.status_sensors(sensor_id, smove, date, room_id) VALUES('".$sensorID ."', '" .$moves ."', '" .$date ."', " .$room .")");
+
+		//Вставка значений температуры.
+		$temperature = $arrayTemperature[$key];
+		$sensorID = $arraySensors[searchArrayFirstKey($arraySensors, "Температура" .$room)]["id_sensor"];
+		_sql("INSERT INTO public.status_sensors(sensor_id, celsium, date, room_id) VALUES('" .$sensorID ."', '" .$temperature ."', '" .$date ."', " .$room .")");
+	}
+	//Вставка крутилки газа.
+	$sensorID = $arraySensors[searchArrayFirstKey($arraySensors, "ЗадвижкаБойлера")]["id_sensor"];
+	_sql("INSERT INTO public.status_sensors(sensor_id, twister_gas, date, room_id) VALUES('" .$sensorID ."', '" .$gas ."', '" .$date ."', 6)");
 
 	if($_GET["is_econom"])
 	{
@@ -155,5 +180,7 @@ if(isset($_GET["p"]) && isset($_GET["t"]) && isset($_GET["g"])) {
 	// Здесь дёргаем последнюю запись крутилок из БД
 	// SELECT!!!
 	// и возвращаем в json'е
-	echo json_encode($temp, JSON_UNESCAPED_UNICODE);
+	$result = _sql("SELECT * FROM public.logs ORDER BY date DESC LIMIT 1");
+
+	echo json_encode($result[0]["log"], JSON_UNESCAPED_UNICODE);
 }

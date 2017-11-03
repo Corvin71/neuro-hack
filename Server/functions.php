@@ -154,4 +154,13 @@ function amountRooms() {
 	return _sql("SELECT count(*) FROM public.rooms WHERE name NOT LIKE 'Бойлерная'")[0]["count"];
 }
 
+function searchArrayFirstKey($source, $item) {
+	for ($i = 0; $i < count($source); $i++) {
+		if ($source[$i]["name"] == $item) {
+			return $i;
+		}
+	}
+	return -1;
+}
+
 ?>
