@@ -1,7 +1,7 @@
 var text = 'Войти в комнату';
 var text2 = 'Выйти из комнаты';
 var check = true;
-var stateTimer = false;
+var timerIsActive = false;
 var temperature = [];
 
 var countOfActiveRooms = 0;
@@ -18,25 +18,25 @@ function SendGet() {
                 "<div id='inf" + parseInt(key + 1) + "_1" +"'>Показания нейросети" + "</div>" +
                 "</div>" + "</td>" +
                 "<td>" +
-                "<input class='slid' id='inp" + parseInt(key + 1) + "_1" + "' type='range' min='0' max='45' step='0.1' value='19' oninput='OnInput(this)'><br><span id='spn" + parseInt(key + 1) + "_1" +  "'></span></td>" +
+                "<input class='slid' id='inp" + parseInt(key + 1) + "_1" + "' type='range' min='0' max='45' step='0.1' value='19' oninput='OnInput(this)'><br><span id='spn" + parseInt(key + 1) + "_1" +  "'>19°C</span></td>" +
                 "<td><button class='btn btn-info' id='" + parseInt(key + 1) + "_1" + "' onclick='Test(this)'>Войти в комнату</button></td></tr>";
-                temperature.push(0);
+                temperature.push(19);
         });
         items += "<tr><td>Бойлерная (положение ручки бойлера)</td><td colspan='3'><input id='gas' class='gaas' type='range' min='0' max='1' step='0.01' value='0.3' oninput='OnInputGas(this)'><span id='spnGas'>" +
-            "</span></td></tr>";
+            "0.3</span></td></tr>";
         $(".rooms").html(items)
     });
 }
 
 function getNetResult(me) {
     //Проверка переключателя.
-    _elSwitchMode = document.getElementById("c");
+    /*_elSwitchMode = document.getElementById("c");
     _is_econom = '';
 
     if (_elSwitchMode.checked)
         _is_econom = 't';
     else
-        _is_econom = 'f';
+        _is_econom = 'f';*/
     
     // Формируем строку запроса
     var request = "Server/data_collection.php?p=";
@@ -49,20 +49,23 @@ function getNetResult(me) {
         temperature[i] = elem.value;
     });
     request = request.substr(0, request.length - 1);
-    //alert(request);
     request += '&g=' + document.getElementById('gas').value;
-    alert(request);
+    // Проверка переключателя
+    if($("#c")[0].checked) {
+        request += '&is_econom=1';
+    }
 
-    $.get(request, function(data){
-        document.getElementById(("loads" + me.id).toString()).style.display = "none";
-        $("#inf" + me.id).html(data)
+    $.getJSON(request, function(data){
+        $.each(data, function(i, item) {
+            $("#inf" + (i + 1) + "_1").html(item);
+        });
     });
 }
 
 function Test(me) {
     //Смена класса у кнопки.
-    document.getElementById(("inf" + me.id).toString()).innerText = '';
-    document.getElementById(("loads" + me.id).toString()).style.display = "block";
+    //document.getElementById(("inf" + me.id).toString()).innerText = '';
+    //document.getElementById(("loads" + me.id).toString()).style.display = "block";
 
     me.disable = true;
     if ((me.value === "t") || (me.value === "")) {
@@ -106,17 +109,19 @@ function OnInputGas(item) {
 }
 
 function StartTimer(me) {
-    if (!stateTimer) {
+    if (!timerIsActive) {
         timerID = setInterval(function () {
             getNetResult(me);
         }, 6000);
 
-        stateTimer = !stateTimer;
+        timerIsActive = true;
     }
 }
 
 function StopTimer() {
     if(timerID !== 0) {
         clearInterval(timerID);
+        timerIsActive = false;
+        timerID = 0;
     }
 }

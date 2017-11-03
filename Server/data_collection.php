@@ -105,7 +105,7 @@ if (isset($_GET["get_rooms"]))
 }
 
 //Запускает или останавливает нейросеть.
-if (isset($_GET["state_neuron"]) && isset($_GET["state_mode"]))
+/*if (isset($_GET["state_neuron"]) && isset($_GET["state_mode"]))
 {
 	//Если пришла стартовая температура, то генерация новой выборки (эмуляция работы датчиков).
 	if (isset($_GET["startTemp"]) && isset($_GET["room_id"])) {
@@ -133,4 +133,27 @@ if (isset($_GET["state_neuron"]) && isset($_GET["state_mode"]))
 if (isset($_POST["log"]) && ($_POST["log"] != ""))
 {
 	_sql("INSERT INTO public.logs(log) VALUES ('" . $_POST["log"] . "')");
+}
+*/
+
+if(isset($_GET["p"]) && isset($_GET["t"]) && isset($_GET["g"])) {
+	// Здесь показания кладутся в базу данных
+	// INSERT!!!
+
+	if($_GET["is_econom"])
+	{
+		// Дёргаем Питона для эконома
+		//exec("python ../neurohouse.py -e");
+		$temp = ['Данные', 'для', 'эконома', 1, $_GET["g"]];
+	}
+	else {
+		// Дёргаем Питона для комфорта
+		//exec("python ../neurohouse.py -c");
+		$temp = ['Данные', 'для', 'комфорта', 3, 4];
+	}
+
+	// Здесь дёргаем последнюю запись крутилок из БД
+	// SELECT!!!
+	// и возвращаем в json'е
+	echo json_encode($temp, JSON_UNESCAPED_UNICODE);
 }
