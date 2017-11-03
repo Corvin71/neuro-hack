@@ -104,35 +104,6 @@ if (isset($_GET["get_rooms"]))
 	echo json_encode($result, JSON_UNESCAPED_UNICODE);
 }
 
-//Запускает или останавливает нейросеть.
-/*if (isset($_GET["state_neuron"]) && isset($_GET["state_mode"]))
-{
-	//Если пришла стартовая температура, то генерация новой выборки (эмуляция работы датчиков).
-	if (isset($_GET["startTemp"]) && isset($_GET["room_id"])) {
-
-	}
-
-	if ($_GET["state_mode"] == 't')
-	{
-		exec("python ../neurohouse.py -e");
-	}
-	else
-	{
-		exec("python ../neurohouse.py -c");
-	}
-
-	$res = _sql("SELECT * FROM public.logs ORDER BY date DESC LIMIT 1");
-	echo $res[0]["log"] . "   " . $res[0]["date"];
-}
-
-
-
-//Запись логов в базу данных.
-if (isset($_POST["log"]) && ($_POST["log"] != ""))
-{
-	_sql("INSERT INTO public.logs(log) VALUES ('" . $_POST["log"] . "')");
-}
-*/
 //TODO - сделать принятие параметров get: p, g, t
 // p - массив присутствия, t - температуры, g - крутилка газа.
 //Server/data_collection.php?p=f,t,t,t,t&t=19,19,19,19,19&g=0.3

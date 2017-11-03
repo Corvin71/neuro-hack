@@ -15,7 +15,7 @@ function SendGet() {
                 "<div class='bar' id='loads" + parseInt(key + 1) + "_1" + "'>" +
                 "<i class='sphere'></i>" +
                 "</div>" +
-                "<div id='inf" + parseInt(key + 1) + "_1" +"'>Показания нейросети" + "</div>" +
+                "<div id='inf" + parseInt(key + 1) + "_1" +"' class='inff'>0, 0" + "</div>" +
                 "</div>" + "</td>" +
                 "<td>" +
                 "<input class='slid' id='inp" + parseInt(key + 1) + "_1" + "' type='range' min='0' max='45' step='0.1' value='19' oninput='OnInput(this)'><br><span id='spn" + parseInt(key + 1) + "_1" +  "'>19°C</span></td>" +
@@ -53,6 +53,11 @@ function getNetResult(me) {
             $("#gas")[0].value = data[data.length - 1];
             $("#spnGas").text(data[data.length - 1]);
         }
+
+        $('.bar').each(function(i, item) {
+            item.style.display = "none";
+        });
+
         $.each(data, function(i, item) {
             temp += item + '; ';
             if(i % 2 != 0) {
@@ -66,6 +71,13 @@ function getNetResult(me) {
 
 function Test(me) {
     //Смена класса у кнопки.
+
+    $('.inff').each(function(i, item) {
+        item.innerText = '';
+    });
+    $('.bar').each(function(i, item) {
+        item.style.display = "block";
+    });
     //document.getElementById(("inf" + me.id).toString()).innerText = '';
     //document.getElementById(("loads" + me.id).toString()).style.display = "block";
 
