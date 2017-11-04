@@ -241,5 +241,5 @@ def pattern(param):
 
 # Справка
 def help_mode():
-    print "9 HE CyMEJI IIO4uHuTb KOguPOBKy, TAK 4TO COCHuTE XEP - CIIPABKu HE 6ygET!"
+    print "Help is here"
     return
