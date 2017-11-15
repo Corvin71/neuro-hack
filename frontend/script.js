@@ -25,7 +25,10 @@ function SendGet() {
         items += "<tr><td>Бойлерная (положение ручки бойлера)</td><td colspan='3'><input id='gas' class='gaas' type='range' min='0' max='1' step='0.01' value='0.3' oninput='OnInputGas(this)'><span id='spnGas'>" +
             "0.3</span></td></tr>";
         $(".rooms").html(items)
-    });
+    })
+    .fail(function() {
+        $(".message").html("Невозможно получить данные. Для повторной попытки обновите страницу.");
+    })
 }
 
 function getNetResult(me) {

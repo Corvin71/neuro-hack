@@ -8,6 +8,15 @@ var mouseX = 0;
 var mouseXOnMouseDown = 0;
 var windowHalfX = window.innerWidth / 2;
 
+// Параметры в окошке по умолчанию
+var params = {
+    Радиатор: 0.5,      // крутилка батареи
+    Кондиционер: 0.5,    // крутилка кондёра
+    Человек_внутри: true,       // присутствие человека
+    Length: 5,
+    Width: 5
+};
+
 init();
 animate();
 
@@ -25,11 +34,12 @@ function init() {
 
     // Cube
     CreateRoom(0,0,0);
+    /*
     CreateRoom(200,0,0);
     CreateRoom(0,0,150);
     CreateRoom(0,-100,0);
-    
-    // Lightning
+    */
+    // Lightning - ЭТО МОЛНИЯ, БЛ*ТЬ!
     CreateLight();
 
     // Plane
@@ -46,6 +56,7 @@ function init() {
         scene.add(radiator);
     });
 
+    // Установки рендера
     renderer = new THREE.WebGLRenderer();
     renderer.setPixelRatio( window.devicePixelRatio );
     renderer.setSize( window.innerWidth, window.innerHeight );
@@ -53,8 +64,16 @@ function init() {
     renderer.gammaOutput = true;
     renderer.shadowMap.enabled = true;
 
+    // Установка поворота камеры по движению мыши
     controls = new THREE.OrbitControls(camera, renderer.domElement);
 
+    // Окошко интерфейса
+    var gui = new dat.GUI();
+    gui.add(params, 'Радиатор', 0, 1);
+    gui.add(params, 'Кондиционер', 0, 1);
+    gui.add(params, 'Человек_внутри', [true, false]);
+
+    gui.open();
     container.appendChild( renderer.domElement );
 }
 
@@ -86,11 +105,11 @@ function CreateCamera() {
 
 function CreateRoom(rX, rY, rZ) {
     //Задняя стена.
-    CreateObjectWall({Ox: rX + 0, Oy: rY + 50, Oz: rZ - 75.5, angleX: 0, angleY: 0, angleZ: Math.PI, width: 200, height: 100, depth: 5, is_floor: false});
+    CreateObjectWall({Ox: rX, Oy: rY + 50, Oz: rZ - 75.5, angleX: 0, angleY: 0, angleZ: Math.PI, width: 200, height: 100, depth: 5, is_floor: false});
     //Пол.
-    CreateObjectWall({Ox: rX + 0, Oy: rY, Oz: rZ, angleX: Math.PI / 2, angleY: 0, angleZ: Math.PI / 2, width: 156, height: 200, depth: 5, is_floor: true});
+    CreateObjectWall({Ox: rX, Oy: rY, Oz: rZ, angleX: Math.PI / 2, angleY: 0, angleZ: Math.PI / 2, width: 156, height: 200, depth: 5, is_floor: true});
     //Передняя стена.
-    CreateObjectWall({Ox: rX + 0, Oy: rY + 50, Oz: rZ + 75.5, angleX: 0, angleY: 0, angleZ: Math.PI, width: 200, height: 100, depth: 5, is_floor: false});
+    CreateObjectWall({Ox: rX, Oy: rY + 50, Oz: rZ + 75.5, angleX: 0, angleY: 0, angleZ: Math.PI, width: 200, height: 100, depth: 5, is_floor: false});
     //Левая стена.
     CreateObjectWall({Ox: rX + 97.5, Oy: rY + 50, Oz: rZ, angleX: 0, angleY: 0, angleZ: Math.PI, width: 5, height: 100, depth: 156, is_floor: false});
     //Правая стена.
