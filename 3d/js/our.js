@@ -54,18 +54,44 @@ function init() {
 
     /**/var mtlLoader = new THREE.MTLLoader();
     mtlLoader.setPath( './models/' );
-    mtlLoader.load('3d-mode3l.mtl', function (materials) {
+    mtlLoader.load('3d-model1.mtl', function (materials) {
         materials.preload();
 
         var radiatorLoader = new THREE.OBJLoader();
         radiatorLoader.setMaterials(materials);
 
-        radiatorLoader.load('./models/3d-model3.obj', function(radiator) {
-
-            scene.add(radiator);
+        radiatorLoader.load('./models/3d-model1.obj', function(radiator) {
+                            //console.log(radiator);
+                            radiator.children[16].material.color.setRGB(0.13, 0.11, 0.08);
+                            radiator.position.set(95, 0, 0);
+                            radiator.rotation.set(0, -Math.PI/2, 0);
+                            scene.add(radiator);
         }, onProgress, onError);
+                   radiatorLoader.load('./models/3d-model1.obj', function(radiator) {
+                                       //console.log(radiator);
+                                       radiator.children[16].material.color.setRGB(0.13, 0.11, 0.08);
+                                       radiator.position.set(100, 0, 0);
+                                       radiator.rotation.set(0, Math.PI/2, 0);
+                                       scene.add(radiator);
+                                       }, onProgress, onError);
     }, onProgress, onError);
-
+    
+    mtlLoader.load('win2.mtl', function (materials) {
+                   materials.preload();
+                   
+                   var radiatorLoader = new THREE.OBJLoader();
+                   radiatorLoader.setMaterials(materials);
+                   
+                   radiatorLoader.load('./models/win2.obj', function(radiator) {
+                                       radiator.children[0].material.color.setRGB(0.13, 0.11, 0.08);
+                                       radiator.scale.set(0.06, 0.035, 0.03);
+                                       radiator.position.set(-90, 45, 0);
+                                       radiator.rotation.set(0, Math.PI/2, 0);
+                                       scene.add(radiator);
+                                       }, onProgress, onError);
+                   
+                   }, onProgress, onError);
+    
 
     var manager = new THREE.LoadingManager();
     manager.onProgress = function( item, loaded, total ) {
@@ -89,7 +115,7 @@ function init() {
 
         object.position.y = 20;
         object.position.x = -93;
-        object.position.z = 40;
+        object.position.z = 20;
         object.rotation.z = Math.PI / 2;
         object.rotation.x = Math.PI / 2;
 
@@ -246,7 +272,7 @@ function CreateObjectWall(stat) {
 
 function CreateLight() {
     // Свет! Озарил мою больную душу...
-    light = new THREE.DirectionalLight(0xffffff, 2);
+    light = new THREE.DirectionalLight(0xffffff, 1);
     light.position.set(0, 200, 120);
     light.castShadow = true;
     scene.add(light);
