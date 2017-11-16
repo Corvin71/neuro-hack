@@ -122,6 +122,39 @@ function init() {
         scene.add( object );
     }, onProgress, onError);
 
+    //Кондиционер.
+    var conditionerLoader = new THREE.OBJLoader();
+
+    conditionerLoader.load('./models/Conditioner.obj', function(conditioner) {
+        conditioner.children[0].material.color.setRGB(0.5, 0.5, 0.5);
+        conditioner.scale.set(2, 2, 2);
+        conditioner.position.set(0, 80, -55);
+        conditioner.rotation.set(0, -Math.PI/2, 0);
+        scene.add(conditioner);
+    }, onProgress, onError);
+
+    //Диван блять.
+    var sofaLoader = new THREE.OBJLoader();
+
+    sofaLoader.load('./models/Sofa.obj', function(sofa) {
+        sofa.children[0].material.color.setRGB(0.13, 0.06, 0.03);
+        sofa.scale.set(0.5, 0.5, 0.5);
+        sofa.position.set(0, 25, 50);
+        sofa.rotation.set(0, -Math.PI, 0);
+        scene.add(sofa);
+    }, onProgress, onError);
+
+    //Телевизор итить-колотить.
+    var tvLoader = new THREE.OBJLoader();
+
+    tvLoader.load('./models/TV.obj', function(tv) {
+        //tv.children[0].material.color.setRGB(0.13, 0.06, 0.03);
+        tv.scale.set(2, 2, 2);
+        tv.position.set(0, 8, -74);
+        tv.rotation.set(0, Math.PI / 2, 0);
+        scene.add(tv);
+    }, onProgress, onError);
+
     //Кондиционер, ибо я думаю про другой перевод...
     /*var condition = new THREE.FBXLoader(manager);
     condition.load( './models/AirCon.FBX', function( object ) {
