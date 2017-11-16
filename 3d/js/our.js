@@ -51,10 +51,105 @@ function init() {
     scene.add( plane );
 
     // Загрузчик модели
-    var radiatorLoader = new THREE.OBJLoader();
-    radiatorLoader.load('./models/radiators.obj', function(radiator) {
-        scene.add(radiator);
-    });
+
+    /**/var mtlLoader = new THREE.MTLLoader();
+    mtlLoader.setPath( './models/' );
+    mtlLoader.load('3d-mode3l.mtl', function (materials) {
+        materials.preload();
+
+        var radiatorLoader = new THREE.OBJLoader();
+        radiatorLoader.setMaterials(materials);
+
+        radiatorLoader.load('./models/3d-model3.obj', function(radiator) {
+
+            scene.add(radiator);
+        }, onProgress, onError);
+    }, onProgress, onError);
+
+
+    var manager = new THREE.LoadingManager();
+    manager.onProgress = function( item, loaded, total ) {
+        console.log( item, loaded, total );
+    };
+
+    var onProgress = function( xhr ) {
+        if ( xhr.lengthComputable ) {
+            var percentComplete = xhr.loaded / xhr.total * 100;
+            console.log( Math.round( percentComplete, 2 ) + '% downloaded' );
+        }
+    };
+
+    var onError = function( xhr ) {
+        console.error( xhr );
+    };
+
+    /**/var radiator = new THREE.FBXLoader(manager);
+    radiator.load( './models/radiator.FBX', function( object ) {
+        object.scale.set(0.08, 0.08, 0.08);
+
+        object.position.y = 20;
+        object.position.x = -93;
+        object.position.z = 40;
+        object.rotation.z = Math.PI / 2;
+        object.rotation.x = Math.PI / 2;
+
+        scene.add( object );
+    }, onProgress, onError);
+
+    //Кондиционер, ибо я думаю про другой перевод...
+    /*var condition = new THREE.FBXLoader(manager);
+    condition.load( './models/AirCon.FBX', function( object ) {
+        object.scale.set(0.08, 0.08, 0.08);
+
+                object.position.y = 20;
+                object.position.x = -93;
+                object.position.z = 40;
+                object.rotation.z = Math.PI / 2;
+                object.rotation.x = Math.PI / 2;
+
+        scene.add( object );
+    }, onProgress, onError);
+*/
+
+    //Тут окно...
+    /*var mtlLoader = new THREE.MTLLoader();
+    mtlLoader.setPath( './models/' );
+    mtlLoader.load('Window.mtl', function (materials) {
+        materials.preload();
+
+        var windowLoader = new THREE.OBJLoader();
+        windowLoader.setMaterials(materials);
+
+        windowLoader.load('./models/Window.obj', function(window) {
+            window.scale.set(5, 5, 5);
+
+            window.position.y = 20;
+            //window.position.x = -93;
+            window.position.z = 40;
+            //window.rotation.z = Math.PI / 2;
+            //window.rotation.x = Math.PI / 2;
+
+            scene.add(window);
+        }, onProgress, onError);
+    }, onProgress, onError);*/
+
+    //ДВЕРЬ БЛЯТЬ
+    /*var doorLoader = new THREE.OBJLoader();
+    var mat = new THREE.MeshBasicMaterial( { color: 0xf2f7ff, overdraw: 0.5 } );
+    //doorLoader.setMaterials(mat);
+
+    doorLoader.load('./models/3d-model2.fbx', function(door) {
+        door.scale.set(3, 3, 4);
+
+        door.position.y = 20;
+        //window.position.x = -93;
+        door.position.z = 40;
+        //window.rotation.z = Math.PI / 2;
+        //window.rotation.x = Math.PI / 2;
+
+        scene.add(door);
+    }, onProgress, onError);
+*/
 
     // Установки рендера
     renderer = new THREE.WebGLRenderer();
