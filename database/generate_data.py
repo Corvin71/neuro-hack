@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 import date
 import random
+import urllib2 as u2
+
+address = 'http://localhost'
+answer = '/smartHome/Server/answer.php'
 
 '''
 with open('131521850387409128.log', 'r') as f:
@@ -71,8 +75,8 @@ def generate(_date, startCelsius, nameFile, step):
     '''for i in range(len(_date)):
         print(_date[i] + ' - ' + _air1[i] + ' - ' + _power1[i] + ' - ' + _cold1[i] + ' - ' + _move1[i])
 '''
-
-    with open(str('sql/'+nameFile + '.sql'), 'w') as f:
+    #Запись в файлы.
+    """with open(str('sql/'+nameFile + '.sql'), 'w') as f:
         for i in range(len(_air1)):
             line1 = "INSERT INTO public.status_sensors(sensor_id, celsium, date) VALUES((SELECT id_sensor FROM public.sensors WHERE name = 'Температура"+ str(step) +"'::text), '" + str(
                 _air1[i]) + "'::text, '" + str(_date[i]) + "'::text);"
@@ -89,24 +93,48 @@ def generate(_date, startCelsius, nameFile, step):
             f.write(line3 + '\n')
             f.write(line4 + '\n')
             f.write(line5 + '\n')
+"""
 
-    return [float(item) for item in _power1]
+    #Формирование запроса. Отправка post данных.
+    line1 = ""
+    for i in range(len(_air1)):
+        line1 += "INSERT INTO public.status_sensors(sensor_id, celsium, date) VALUES((SELECT id_sensor FROM public.sensors WHERE name = 'Температура" + str(
+            step) + "'::text), '" + str(
+            _air1[i]) + "'::text, '" + str(_date[i]) + "'::text);"
+        line1 += "INSERT INTO public.status_sensors(sensor_id, twister_radiator, date) VALUES((SELECT id_sensor FROM public.sensors WHERE name = 'Радиатор" + str(
+            step) + "'::text), '" + str(
+            _power1[i]) + "'::text, '" + str(_date[i]) + "'::text);"
+        line1 += "INSERT INTO public.status_sensors(sensor_id, twister_cold, date) VALUES((SELECT id_sensor FROM public.sensors WHERE name = 'Кондиционер" + str(
+            step) + "'::text), '" + str(
+            _cold1[i]) + "'::text, '" + str(_date[i]) + "'::text);"
+        line1 += "INSERT INTO public.status_sensors(sensor_id, energy, date) VALUES((SELECT id_sensor FROM public.sensors WHERE name = 'Энергия" + str(
+            step) + "'::text), '" + str(
+            _energy1[i]) + "'::text, '" + str(_date[i]) + "'::text);"
+        line1 += "INSERT INTO public.status_sensors(sensor_id, smove, date) VALUES((SELECT id_sensor FROM public.sensors WHERE name = 'Движение" + str(
+            step) + "'::text), '" + str(
+            _move1[i]) + "'::text, '" + str(_date[i]) + "'::text);"
 
+    #line1 - строка, в которой лежат все INSERT'ы.
+    return [float(item) for item in _power1], line1
+
+line1 = ""
 for j in range(7):
     _date = date.get_hours(11 + j) #T
     s = [0 for i in range(71)]
     for i in range(1,6):
-        s1 = generate(_date, 15 + random.uniform(-1.5, 1.5), "room" + str(i) + '_' + str(j), i)
+        s1, line1 = generate(_date, 15 + random.uniform(-1.5, 1.5), "room" + str(i) + '_' + str(j), i)
         s = list(map(lambda x, y: x + y, s, s1))
     s = [1.0 / item if item > 1 else item for item in s]
-    with open(str('sql/power' + str(j) + '.sql'), 'w') as f:
-        for k in range(len(s)):
-            line1 = "INSERT INTO public.status_sensors(sensor_id, consum_gas, date) VALUES((SELECT id_sensor FROM public.sensors WHERE name = 'Бойлер'::text), '" + str(
-                    s[k]) + "'::text, '" + str(_date[k]) + "'::text);"
-            line2 = "INSERT INTO public.status_sensors(sensor_id, twister_gas, date) VALUES((SELECT id_sensor FROM public.sensors WHERE name = 'ЗадвижкаБойлера'::text), '" + str(
-                    1.0/(s[k]*1.1) if s[k] > 1 else s[k]*1.1) + "'::text, '" + str(_date[k]) + "'::text);"
-            f.write(line1 + '\n')
-            f.write(line2 + '\n')
+    for k in range(len(s)):
+        line1 += "INSERT INTO public.status_sensors(sensor_id, consum_gas, date) VALUES((SELECT id_sensor FROM public.sensors WHERE name = 'Бойлер'::text), '" + str(
+            s[k]) + "'::text, '" + str(_date[k]) + "'::text);"
+        line1 += "INSERT INTO public.status_sensors(sensor_id, twister_gas, date) VALUES((SELECT id_sensor FROM public.sensors WHERE name = 'ЗадвижкаБойлера'::text), '" + str(
+            1.0/(s[k]*1.1) if s[k] > 1 else s[k]*1.1) + "'::text, '" + str(_date[k]) + "'::text);"
+
+#Отправка post - запросом данных в базу.
+postData = "ins_db=" + line1
+request = u2.Request(address + answer, postData)
+response = u2.urlopen(request)
 
 '''for line in s1:
     temp = line.split(';')

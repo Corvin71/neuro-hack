@@ -2,7 +2,7 @@
 
 import random
 
-#288 измерений в день
+#72 измерений в день
 
 def get_hours(day):
     i = 1

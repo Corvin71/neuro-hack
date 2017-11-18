@@ -159,3 +159,16 @@ if(isset($_GET["p"]) && isset($_GET["t"]) && isset($_GET["g"])) {
 	$answer = json_decode($result[0]["log"]);
 	echo json_encode($answer, JSON_UNESCAPED_UNICODE);
 }
+
+
+//Запуск скрипта обучающей выборки python.
+if (isset($_GET["start_learning"])) {
+	if ($_GET["start_learning"] == 1) {
+		//Дергаем Питон для генерации обучающей выборки.
+		exec("python ../database/generate_data.py");
+	}
+	elseif ($_GET["start_learning"] == 2) {
+		//Дергаем Питона для запуска процесса обучения.
+		exec("python ../neurohouse.py --learn-only");
+	}
+}

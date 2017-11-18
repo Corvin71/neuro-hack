@@ -4,11 +4,13 @@ var check = true;
 var timerIsActive = false;
 var temperature = [];
 
+var serverAddress = "../Server/data_collection.php";
+
 var countOfActiveRooms = 0;
 var timerID = 0;
 
 function SendGet() {
-    $.getJSON("Server/data_collection.php?get_rooms=1", function (data) {
+    $.getJSON(serverAddress + "?get_rooms=1", function (data) {
         var items = "<thead><tr><th  class='text-center'>Название комнаты</th><th class='text-center'>Показания нейросети</th><th   class='text-center'>Температура</th><th colspan='2'  class='text-center'>Действие</th></tr></thead>";
         $.each(data, function (key, value) {
             items += "<tr><td>" + value + "</td><td><div class='demo-1'>" +
@@ -33,7 +35,7 @@ function SendGet() {
 
 function getNetResult(me) {
     // Формируем строку запроса
-    var request = "Server/data_collection.php?p=";
+    var request = serverAddress + "?p=";
     $('.btn').each(function(i, elem) {
         request += elem.value !== '' ? elem.value + ',' : 't,';
     });
@@ -141,4 +143,9 @@ function StopTimer() {
         timerIsActive = false;
         timerID = 0;
     }
+}
+
+function StartLearning() {
+    //Открытие новой вкладки.
+    window.open("learning.html");
 }
