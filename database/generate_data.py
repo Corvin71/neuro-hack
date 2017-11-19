@@ -117,22 +117,23 @@ def generate(_date, startCelsius, nameFile, step):
     #line1 - строка, в которой лежат все INSERT'ы.
     return [float(item) for item in _power1], line1
 
-line1 = ""
+line = ""
 for j in range(7):
     _date = date.get_hours(11 + j) #T
     s = [0 for i in range(71)]
     for i in range(1,6):
         s1, line1 = generate(_date, 15 + random.uniform(-1.5, 1.5), "room" + str(i) + '_' + str(j), i)
+        line += line1
         s = list(map(lambda x, y: x + y, s, s1))
     s = [1.0 / item if item > 1 else item for item in s]
     for k in range(len(s)):
-        line1 += "INSERT INTO public.status_sensors(sensor_id, consum_gas, date) VALUES((SELECT id_sensor FROM public.sensors WHERE name = 'Бойлер'::text), '" + str(
+        line += "INSERT INTO public.status_sensors(sensor_id, consum_gas, date) VALUES((SELECT id_sensor FROM public.sensors WHERE name = 'Бойлер'::text), '" + str(
             s[k]) + "'::text, '" + str(_date[k]) + "'::text);"
-        line1 += "INSERT INTO public.status_sensors(sensor_id, twister_gas, date) VALUES((SELECT id_sensor FROM public.sensors WHERE name = 'ЗадвижкаБойлера'::text), '" + str(
+        line += "INSERT INTO public.status_sensors(sensor_id, twister_gas, date) VALUES((SELECT id_sensor FROM public.sensors WHERE name = 'ЗадвижкаБойлера'::text), '" + str(
             1.0/(s[k]*1.1) if s[k] > 1 else s[k]*1.1) + "'::text, '" + str(_date[k]) + "'::text);"
 
 #Отправка post - запросом данных в базу.
-postData = "ins_db=" + line1
+postData = "ins_db=" + line
 request = u2.Request(address + answer, postData)
 response = u2.urlopen(request)
 
