@@ -16,11 +16,58 @@
 </head>
 <body class="container" onload="onLoadPage()">
 <h2 class="info" align="center"></h2>
-<div class="row col-sm-1"></div>
-<div class="col-sm-2">
-    <button class="startStopLearn btn btn-lg" onclick="startLearn()">1</button>
+<div class="grid">
+    <div class="row">
+        <div class="col-sm-3 col-sg-3 col-md-3">
+            <button class="startStopLearn btn btn-lg" onclick="startLearn()">1</button>
+        </div>
+        <div class="col-sm-1 col-sg-1 col-md-1"></div>
+        <div class="col-sm-2 col-sg-2 col-md-2">
+            <button class="continueLearn btn btn-lg btn-default" onclick="continueLearn()">Продолжить обучение</button>
+        </div>
+    </div>
     <br>
-    <button class="continueLearn btn btn-lg btn-default" onclick="continueLearn()">Продолжить обучение</button>
+    <div class="row">
+        <div class="col-sm-6">
+
+            <div class="panel-group" id="collapse-group">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#collapse-group" href="#el1">Обучающая выборка</a>
+                        </h4>
+                    </div>
+                    <div id="el1" class="panel-collapse collapse">
+                        <div class="panel-body">Lorem ipsum dolor sit amet, consectetur adipisicing elit,
+                            sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</div>
+                    </div>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#collapse-group" href="#el2">Второй элемент</a>
+                        </h4>
+                    </div>
+                    <div id="el2" class="panel-collapse collapse">
+                        <div class="panel-body">Lorem ipsum dolor sit amet, consectetur adipisicing elit,
+                            sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</div>
+                    </div>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#collapse-group" href="#el3">Третий элемент</a>
+                        </h4>
+                    </div>
+                    <div id="el3" class="panel-collapse collapse">
+                        <div class="panel-body">Lorem ipsum dolor sit amet, consectetur adipisicing elit,
+                            sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
 </div>
 </body>
 </html>
