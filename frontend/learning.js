@@ -1,5 +1,5 @@
 var serverAddress = "../Server/data_collection.php";
-var statStartLearning = false;
+var statStartLearning = 0;
 
 function onLoadPage() {
     startLearn();
@@ -13,32 +13,44 @@ function startLearn() {
     //Стучимся на сервер и смотрим в какой стадии обучение.
     $.getJSON(serverAddress + "?info_learn=0", function (result) {
         console.log(result);
+        // Обучение прервано
         if (result === "f") {
             //Случай с прерванным обучением.
+            $('.startStopLearn').html('Начать обучение заново');
+            $('.continueLearn').css('display', 'block');
             $('.startStopLearn')["0"].classList.remove("btn-info");
             $('.startStopLearn')["0"].classList.add("btn-default");
-            statStartLearning = !statStartLearning; //true
-            $('.startStopLearn')["0"].innerText = "Возобновить обучение";
-            $('.continueLearn')["0"].style.display = "block";
+            statStartLearning = 0;
         }
+        // Обучение завершено
         else if (result === "") {
-            $('.startStopLearn')["0"].innerText = "Перезапустить обучение";
-            statStartLearning = !statStartLearning;
+            $('.startStopLearn').html('Начать обучение заново');
+            $('.continueLearn').css('display', 'none');            
             $('.startStopLearn')["0"].classList.remove("btn-default");
             $('.startStopLearn')["0"].classList.add("btn-info");
+            statStartLearning = 1;
         }
+        // Обучение в процессе
         else if (result === "t") {
-            //Случай с прерванным обучением.
+            $('.startStopLearn').html('Прервать обучение');
+            $('.continueLearn').css('display', 'none');
             $('.startStopLearn')["0"].classList.remove("btn-info");
-            $('.startStopLearn')["0"].classList.add("btn-default");
-            statStartLearning = !statStartLearning; //true
-            $('.startStopLearn')["0"].innerText = "Прервать обучение";
-            $('.continueLearn')["0"].style.display = "block";
+            statStartLearning = 5;
         }
     });
 
-    if (!statStartLearning) {
-        //$('.startStopLearn').classList.add()
+    switch(statStartLearning){
+        // 0 === false
+        case 0:
+            break;
+        // 1 === null
+        case 1:
+            break;
+        // 5 === true
+        case 5:
+            break;
+        default:
+            alert('хер');
     }
 
     /*$('.info').innerText = "Осуществляется запуск генерации обучающей выборки...";
