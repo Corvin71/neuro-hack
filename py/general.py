@@ -16,6 +16,7 @@ answer      = '/smartHack/Server/answer.php'
 # Параметры сервера
 is_learning = '?is_learning='
 rooms       = '?how_rooms=1'
+log_remote  = '?post_info=1'
 save        = ''
 load        = ''
 # Параметры нейронных сетей
@@ -73,7 +74,7 @@ def learning(datablock, c_net, e_net, days_left):
     e_err /= len(Xe_test)
     days_left -= 1
     # Логгирование и сохранение
-    log('Epoch complete. Errors: comfort: ' + str(c_err) + '; econom: ' + str(e_err) + '. Left (days): ' + str(days_left))
+    log('Epoch complete. Errors: comfort: ' + str(c_err) + '; econom: ' + str(e_err) + '; left (days): ' + str(days_left))
     save_net(c_net, e_net, days_left) # Сохранение данных каждый день
     if days_left != 0:
         await()
@@ -210,6 +211,9 @@ def log(message):
     print message
     with open('logs.log', 'a') as log:
         log.write(message + '\n')
+    postData = "log=" + message
+    request = u2.Request(address + answer, postData)
+    response = u2.urlopen(request)
     return
 
 ''' Параметры командной строки '''
