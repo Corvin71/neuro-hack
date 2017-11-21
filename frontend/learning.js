@@ -66,3 +66,26 @@ function continueLearn() {
     $.getJSON(serverAddress + "?info_learn=1", changeStateButton());
 }
 
+function loadInfoSelection() {
+    $('.info-selection').load(serverAddress + "?get_learning_selection=1&totalDisplayRecords=2", function (answer) {
+        $('.data-table-info').dataTable({
+            'ajax': {
+                "data"   : answer
+            },
+            'columns': [
+                {"data" : "Дата"},
+                {"data" : "Комната"},
+                {"data" : "Расход газа"},
+                {"data" : "Регулятор газа"},
+                {"data" : "Температура по Цельсию"},
+                {"data" : "Регулятор кондиционера"},
+                {"data" : "Регулятор радиатора"},
+                {"data" : "Расход энергии"},
+                {"data" : "Датчик движения"}
+            ]
+        });
+        //$('.info-selection').innerHTML = answer;
+    });
+}
+
+

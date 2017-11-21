@@ -7,8 +7,10 @@
     <script src="learning.js"></script>
 
     <script type="text/javascript" src="js/jquery-2.2.4.min.js"></script>
+    <script type="text/javascript" src="js/jquery.dataTables.min.js"></script>
     <!--<script type="text/javascript" src="http://code.jquery.com/jquery-2.2.4.js"></script>-->
     <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="css/bootstrap-theme.min.css">
     <script src="js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="css/bootstrap-slider.css">
@@ -28,24 +30,25 @@
     </div>
     <br>
     <div class="row">
-        <div class="col-sm-6">
+        <div class="col-sm-7">
 
             <div class="panel-group" id="collapse-group">
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <h4 class="panel-title">
-                            <a data-toggle="collapse" data-parent="#collapse-group" href="#el1">Обучающая выборка</a>
+                            <a data-toggle="collapse" data-parent="#collapse-group" href="#el1" onclick="loadInfoSelection()">Обучающая выборка</a>
                         </h4>
                     </div>
                     <div id="el1" class="panel-collapse collapse">
-                        <div class="panel-body">Lorem ipsum dolor sit amet, consectetur adipisicing elit,
-                            sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</div>
+                        <div class="panel-body info-selection">Производится загрузка данных...
+                            <div class="data-table-info">
+                            </div></div>
                     </div>
                 </div>
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <h4 class="panel-title">
-                            <a data-toggle="collapse" data-parent="#collapse-group" href="#el2">Второй элемент</a>
+                            <a data-toggle="collapse" data-parent="#collapse-group" href="#el2">Статистика процесса обучения</a>
                         </h4>
                     </div>
                     <div id="el2" class="panel-collapse collapse">

@@ -190,3 +190,21 @@ if (isset($_GET["info_learn"])) {
 			break;
 	}
 }
+
+//Возвращает данные по выборке для обучения.
+if (isset($_GET["get_learning_selection"])) {
+	$totalDisplayRecords = 1;
+	if (isset($_GET["totalDisplayRecords"])) {
+		$totalDisplayRecords = $_GET["totalDisplayRecords"];
+	}
+	$resultSql = _sql("SELECT * FROM public.info_learning LIMIT " .$totalDisplayRecords ." ;");
+	$iTotalRecords = _sql("SELECT count(*) FROM public.status_sensors")[0]["count"];
+	$sEcho = 10;
+
+	$result = array("iTotalRecords" => $iTotalRecords,
+		"iTotalDisplayRecords" => $totalDisplayRecords,
+		"sEcho" => $sEcho,
+		"aaData" => $resultSql);
+
+	echo json_encode($resultSql, JSON_UNESCAPED_UNICODE);
+}
