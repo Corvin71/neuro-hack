@@ -52,7 +52,7 @@ def generate(_date, startCelsius, nameFile, step):
             _energy1.append(str(c * 1.1))
             startCelsiumSensor1 += _deltaTemperature + random.uniform(-0.2, 0.2)
             _air1.append(str(startCelsiumSensor1))
-        # Держим стационарный режым...
+        # Держим стационарный режим...
         elif (i >= airTime + amountHour) and (i < airTime + amountHour + amountStableHour):
             _move1.append('1')
             _power1.append(str(0.3 + random.uniform(-0.1, 0.1)))

@@ -8,13 +8,21 @@ import urllib as u
 import urllib2 as u2
 import comfort as c
 import econom as e
-address = 'http://corvin71.ddns.net'
-path = '/smartHack/Server/data_collection.php'
-answer = '/smartHack/Server/answer.php'
+
+# Пути сервера
+address     = 'http://corvin71.ddns.net'
+path        = '/smartHack/Server/data_collection.php'
+answer      = '/smartHack/Server/answer.php'
+# Параметры сервера
 is_learning = '?is_learning='
-rooms = '?how_rooms=1'
-save = ''
-load = ''
+rooms       = '?how_rooms=1'
+save        = ''
+load        = ''
+# Параметры нейронных сетей
+learn_size  = 0.7
+epoch_dur   = 5     # Длительность эпохи (в секундах)
+alive_sig   = 1     # Периодичность отсылки сигнала "Жив!" (в секундах)
+kW_room     = 2     # Максимальная электроэнергия на комнату
 
 ''' Отладка!!! '''
 from datetime import timedelta
@@ -39,26 +47,30 @@ def post_data(result):
     response = u2.urlopen(request)
     return
 
-''' Обучение и эксплуатация нейронок '''
+''' Обучение и эксплуатация нейронных сетей '''
 # Вызывается, когда нужно обучить сеть.
 # Возвращает количество дней, оставшихся для обучения
 def learning(datablock, c_net, e_net, days_left):
-    Xc, Yc = to_c_blocks(datablock)
-    Xe, Ye = to_e_blocks(datablock)
-    c_net = c.learn_epoch(Xc, Yc, c_net)
-    e_net = e.learn_epoch(Xe, Ye, e_net)
-    # Расчёт оптимизатора ВЫКИНУТЬ ИЗ РЕЛИЗА!
+    train, test = split_datablock(datablock)
+    Xc_train, Yc_train = to_c_blocks(train)
+    Xc_test, Yc_test = to_c_blocks(test)
+    Xe_train, Ye_train = to_e_blocks(train)
+    Xe_test, Ye_test = to_e_blocks(test)
+    
+    c_net = c.learn_epoch(Xc_train, Yc_train, c_net)
+    e_net = e.learn_epoch(Xe_train, Ye_train, e_net)
+    '''# Расчёт оптимизатора ВЫКИНУТЬ ИЗ РЕЛИЗА!
     print 'Optimization before learning (for middle): '
     temps = [Xc[30][i] for i in range(2, len(Xc[0]), 2)]
     params = [Xc[30][0]] + [Xc[30][i] for i in range(3, len(Xc[0]), 2)]
-    print e.optimize(temps, count_of_rooms(datablock[0]), e_net, c_net, params)
+    print e.optimize(temps, count_of_rooms(datablock[0]), e_net, c_net, params)'''
     # Расчёт ошибок
     c_err, e_err = 0, 0
-    for i in range(len(Xc)):
-        c_err += c.error(c.calc(Xc[i], c_net), Yc[i])
-        e_err += e.error(e.calc(Xe[i], e_net), Ye[i])
-    c_err /= len(Xc)
-    e_err /= len(Xe)
+    for i in range(len(Xc_test)):
+        c_err += c.error(c.calc(Xc_test[i], c_net), Yc_test[i])
+        e_err += e.error(e.calc(Xe_test[i], e_net), Ye_test[i])
+    c_err /= len(Xc_test)
+    e_err /= len(Xe_test)
     days_left -= 1
     # Логгирование и сохранение
     log('Epoch complete. Errors: comfort: ' + str(c_err) + '; econom: ' + str(e_err) + '. Left (days): ' + str(days_left))
@@ -82,14 +94,14 @@ def econom(datapiece, c_net, e_net):
     return e_res
 
 ''' Запись и загрузка нейронок '''
-# Сохраняет сети и количество дней (в файл или на сервер)
+# Сохраняет сети и количество дней
 def save_net(c_net, e_net, days_left):
     with open('neuronet.npy', 'wb') as f:
         np.save(f, np.array([c_net, e_net, days_left]))
     log('Saved')
     return
 
-# Загружает сети и количество (из файла или с сервера)
+# Загружает сети и количество
 def load_net(path):
     with open(path, 'rb') as f:
         obj = np.load(f)
@@ -147,10 +159,37 @@ def to_e_blocks(datablock):
         x.append(temp_x)
         s = 0
         for i in range(7, len(datapiece), 5):
-            s += datapiece[i]               # Находим сумму энергий
-        temp_y = [datapiece[1], s]          # и докидываем расходы
+            s += datapiece[i]                                               # Находим сумму энергий
+        temp_y = [datapiece[1], s / (kW_room * count_of_rooms(datablock))]  # и докидываем расходы
         y.append(temp_y)
     return x, y
+
+# Разделение блока данных на обучающую и тестовую выборки
+def split_datablock(datablock):
+    train_count = int(len(datablock) * learn_size)
+    step = train_count // len(datablock)
+    train = []
+    test = datablock
+    while train_count > 0:
+        tmp_train, tmp_test, train_count = _rec_split_(test, step, train_count)
+        train.extend(tmp_train)
+        test = tmp_test
+    log('Splited! Train size: ' + str(len(train)) + '; test size: ' + str(len(test)) + '; length: ' + str(len(datablock)))
+    return train, test
+
+def _rec_split_(datablock, step, train_count):
+    train = []
+    test = []
+    j = 0
+    for i in range(len(datablock)):
+        if j == 0 and train_count > 0:
+            train.append(datablock[i])
+            j = step
+            train_count -= 1
+        else:
+            test.append(datablock[i])
+            j -= 1
+    return train, test, train_count
 
 ''' Служебное '''
 # Получить количество комнат по выборке
@@ -159,11 +198,11 @@ def count_of_rooms(datablock):
 
 # Ожидание данных
 def await():
-    tm = 5
+    tm = epoch_dur
     while tm > 0:
         log('I am alive')
-        tm -= 1
-        t.sleep(1) # Отладка!!!
+        tm -= alive_sig
+        t.sleep(alive_sig) # Отладка!!!
 
 # Ведение логов
 def log(message):
