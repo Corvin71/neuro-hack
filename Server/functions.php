@@ -146,7 +146,7 @@ function timeToValue($time)
 function _sql($query) {
 	$log  = "postgres";
 	$pass = "123456";
-	$host = "localhost";
+	$host = "corvin71.ddns.net";
 	return sql_user($host, "smartHack", "5432", $log, $pass, $query);
 }
 
