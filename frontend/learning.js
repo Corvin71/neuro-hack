@@ -6,6 +6,88 @@ function onLoadPage() {
     //Скрываем кнопку "Продолжить обучение"
     if (!statStartLearning)
         $('.continueLearn')["0"].style.display = "none";
+
+    loadInfoLearningSource();
+    loadInfoLearningStats();
+}
+
+//Инициализация таблицы выгрзки обучающей выборки.
+function loadInfoLearningSource() {
+    $('#data-table').dataTable({
+        "processing": true,
+        "serverSide": true,
+        'ajax': serverAddress + "?get_learning_selection=1",
+        'columns': [
+            {"data" : "Дата"},
+            {"data" : "Комната"},
+            {"data" : "Расход газа"},
+            {"data" : "Регулятор газа"},
+            {"data" : "Температура по Цельсию"},
+            {"data" : "Регулятор кондиционера"},
+            {"data" : "Регулятор радиатора"},
+            {"data" : "Расход энергии"},
+            {"data" : "Датчик движения"}
+        ],
+        language: {
+            "processing": "Подождите...",
+            "search": "Поиск:",
+            "lengthMenu": "Показать _MENU_ записей",
+            "info": "Записи с _START_ до _END_ из _TOTAL_ записей",
+            "infoEmpty": "Записи с 0 до 0 из 0 записей",
+            "infoFiltered": "(отфильтровано из _MAX_ записей)",
+            "infoPostFix": "",
+            "loadingRecords": "Загрузка записей...",
+            "zeroRecords": "Записи отсутствуют.",
+            "emptyTable": "В таблице отсутствуют данные",
+            "paginate": {
+                "first": "Первая",
+                "previous": "Предыдущая",
+                "next": "Следующая",
+                "last": "Последняя"
+            },
+            "aria": {
+                "sortAscending": ": активировать для сортировки столбца по возрастанию",
+                "sortDescending": ": активировать для сортировки столбца по убыванию"
+            }
+        }
+    });
+}
+
+//Инициализация таблицы статистики процесса обучения.
+function loadInfoLearningStats() {
+    $('#data-table-network').dataTable({
+        "processing": true,
+        "serverSide": true,
+        'ajax': serverAddress + "?get_info_learn=1",
+        'columns': [
+            {"data" : "Дата"},
+            {"data" : "Кол-во оставшихся дней"},
+            {"data" : "Ошибка сети 'Комфорт'"},
+            {"data" : "Ошибка сети 'Эконом'"}
+        ],
+        language: {
+            "processing": "Подождите...",
+            "search": "Поиск:",
+            "lengthMenu": "Показать _MENU_ записей",
+            "info": "Записи с _START_ до _END_ из _TOTAL_ записей",
+            "infoEmpty": "Записи с 0 до 0 из 0 записей",
+            "infoFiltered": "(отфильтровано из _MAX_ записей)",
+            "infoPostFix": "",
+            "loadingRecords": "Загрузка записей...",
+            "zeroRecords": "Записи отсутствуют.",
+            "emptyTable": "В таблице отсутствуют данные",
+            "paginate": {
+                "first": "Первая",
+                "previous": "Предыдущая",
+                "next": "Следующая",
+                "last": "Последняя"
+            },
+            "aria": {
+                "sortAscending": ": активировать для сортировки столбца по возрастанию",
+                "sortDescending": ": активировать для сортировки столбца по убыванию"
+            }
+        }
+    });
 }
 
 function startLearn() {
@@ -67,25 +149,11 @@ function continueLearn() {
 }
 
 function loadInfoSelection() {
-    $('.info-selection').load(serverAddress + "?get_learning_selection=1&totalDisplayRecords=2", function (answer) {
-        $('.data-table-info').dataTable({
-            'ajax': {
-                "data"   : answer
-            },
-            'columns': [
-                {"data" : "Дата"},
-                {"data" : "Комната"},
-                {"data" : "Расход газа"},
-                {"data" : "Регулятор газа"},
-                {"data" : "Температура по Цельсию"},
-                {"data" : "Регулятор кондиционера"},
-                {"data" : "Регулятор радиатора"},
-                {"data" : "Расход энергии"},
-                {"data" : "Датчик движения"}
-            ]
-        });
-        //$('.info-selection').innerHTML = answer;
-    });
+    //$('#data-table').load(serverAddress + "?get_learning_selection=1&totalDisplayRecords=2", function (answer) {
+    $('.status-load').text('Производится загрузка данных...');
+    $('.status-load').text('Данные упешно загружены');
+    $('.status-load').text('');
+    //});
 }
 
 

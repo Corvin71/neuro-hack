@@ -30,30 +30,63 @@
     </div>
     <br>
     <div class="row">
-        <div class="col-sm-7">
+        <div class="col-sm-12">
 
             <div class="panel-group" id="collapse-group">
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <h4 class="panel-title">
-                            <a data-toggle="collapse" data-parent="#collapse-group" href="#el1" onclick="loadInfoSelection()">Обучающая выборка</a>
+                            <a data-toggle="collapse" data-parent="#collapse-group" href="#el1"
+                               onclick="loadInfoSelection()">Обучающая выборка</a>
                         </h4>
                     </div>
                     <div id="el1" class="panel-collapse collapse">
-                        <div class="panel-body info-selection">Производится загрузка данных...
-                            <div class="data-table-info">
-                            </div></div>
+                        <div class="panel-body info-selection">
+                            <div class="status-load">
+                                Производится загрузка данных...
+                            </div>
+                            <table id="data-table" class="table table-striped table-bordered table-hover display">
+                                <thead>
+                                <tr>
+                                    <th>Дата</th>
+                                    <th>Комната</th>
+                                    <th>Расход газа</th>
+                                    <th>Регулятор газа</th>
+                                    <th>Температура по Цельсию</th>
+                                    <th>Регулятор кондиционера</th>
+                                    <th>Регулятор радиатора</th>
+                                    <th>Расход энергии</th>
+                                    <th>Датчик движения</th>
+                                </tr>
+                                </thead>
+                            </table>
+                        </div>
                     </div>
                 </div>
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <h4 class="panel-title">
-                            <a data-toggle="collapse" data-parent="#collapse-group" href="#el2">Статистика процесса обучения</a>
+                            <a data-toggle="collapse" data-parent="#collapse-group" href="#el2">Статистика процесса
+                                обучения</a>
                         </h4>
                     </div>
                     <div id="el2" class="panel-collapse collapse">
-                        <div class="panel-body">Lorem ipsum dolor sit amet, consectetur adipisicing elit,
-                            sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</div>
+                        <div class="panel-body"><div class="panel-body">
+                            <div class="status-network">
+                                Производится загрузка данных...
+                            </div>
+                            <table id="data-table-network" class="table table-striped table-bordered table-hover display">
+                                <thead>
+                                <tr>
+                                    <th>Дата</th>
+                                    <th>Кол-во оставшихся дней</th>
+                                    <th>Ошибка сети 'Комфорт'</th>
+                                    <th>Ошибка сети 'Эконом'</th>
+                                </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        </div>
                     </div>
                 </div>
                 <div class="panel panel-default">
@@ -64,7 +97,8 @@
                     </div>
                     <div id="el3" class="panel-collapse collapse">
                         <div class="panel-body">Lorem ipsum dolor sit amet, consectetur adipisicing elit,
-                            sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</div>
+                            sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                        </div>
                     </div>
                 </div>
             </div>

@@ -193,18 +193,26 @@ if (isset($_GET["info_learn"])) {
 
 //Возвращает данные по выборке для обучения.
 if (isset($_GET["get_learning_selection"])) {
-	$totalDisplayRecords = 1;
-	if (isset($_GET["totalDisplayRecords"])) {
-		$totalDisplayRecords = $_GET["totalDisplayRecords"];
-	}
-	$resultSql = _sql("SELECT * FROM public.info_learning LIMIT " .$totalDisplayRecords ." ;");
+	$resultSql = _sql("SELECT * FROM public.info_learning LIMIT " .$_GET["length"] ." OFFSET " .$_GET["start"] .";");
+
 	$iTotalRecords = _sql("SELECT count(*) FROM public.status_sensors")[0]["count"];
-	$sEcho = 10;
 
-	$result = array("iTotalRecords" => $iTotalRecords,
-		"iTotalDisplayRecords" => $totalDisplayRecords,
-		"sEcho" => $sEcho,
-		"aaData" => $resultSql);
+	$newResult = array("draw" => isset ( $_GET['draw'] ) ? intval( $_GET['draw'] ) : 0,
+	                   "recordsTotal" => intval($iTotalRecords),
+	                   "data" => $resultSql);
 
-	echo json_encode($resultSql, JSON_UNESCAPED_UNICODE);
+	echo json_encode($newResult, JSON_UNESCAPED_UNICODE);
+}
+
+//Получение статистики процесса обучения.
+if (isset($_GET["get_info_learn"])) {
+	$resultSql = _sql("SELECT * FROM public.view_info_learn LIMIT " .$_GET["length"] ." OFFSET " .$_GET["start"] .";");
+
+	$iTotalRecords = _sql("SELECT count(*) FROM public.info_learn")[0]["count"];
+
+	$newResult = array("draw" => isset ( $_GET['draw'] ) ? intval( $_GET['draw'] ) : 0,
+	                   "recordsTotal" => intval($iTotalRecords),
+	                   "data" => $resultSql);
+
+	echo json_encode($newResult, JSON_UNESCAPED_UNICODE);
 }
