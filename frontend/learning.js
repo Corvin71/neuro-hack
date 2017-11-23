@@ -1,4 +1,4 @@
-var serverAddress = "../Server/data_collection.php";
+var serverAddress = "http://corvin71.ddns.net/smartHack/Server/data_collection.php";
 var statStartLearning = "";
 
 function onLoadPage() {
@@ -14,8 +14,8 @@ function onLoadPage() {
 //Инициализация таблицы выгрзки обучающей выборки.
 function loadInfoLearningSource() {
     $('#data-table').dataTable({
-        "processing": true,
-        "serverSide": true,
+        /*"processing": true,
+        "serverSide": true,*/
         'ajax': serverAddress + "?get_learning_selection=1",
         'columns': [
             {"data" : "Дата"},
@@ -56,8 +56,8 @@ function loadInfoLearningSource() {
 //Инициализация таблицы статистики процесса обучения.
 function loadInfoLearningStats() {
     $('#data-table-network').dataTable({
-        "processing": true,
-        "serverSide": true,
+        /*"processing": true,
+        "serverSide": true,*/
         'ajax': serverAddress + "?get_info_learn=1",
         'columns': [
             {"data" : "Дата"},

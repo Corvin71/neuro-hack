@@ -14,9 +14,9 @@ address     = 'http://corvin71.ddns.net'
 path        = '/smartHack/Server/data_collection.php'
 answer      = '/smartHack/Server/answer.php'
 # Параметры сервера
+is_work     = '?is_work=1'
 is_learning = '?is_learning='
 rooms       = '?how_rooms=1'
-log_remote  = '?post_info=1'
 save        = ''
 load        = ''
 # Параметры нейронных сетей
@@ -37,8 +37,9 @@ def get_data(learning=False, day=d.datetime.today().date()):
         response = u.urlopen(address + path + is_learning + d.datetime.strftime(day, "%d.%m.%Y"))
     else:
         log('Listening to sever')
-        response = u.urlopen(address + path)
+        response = u.urlopen(address + path + is_work)
         log('Answer received')
+    c_rooms = int(u.urlopen(address + path + rooms).read()[3:])    
     return j.loads(response.read()[3:])
 
 # Загружает полученную информацию на сервер
@@ -62,8 +63,10 @@ def learning(datablock, c_net, e_net, days_left):
     e_net = e.learn_epoch(Xe_train, Ye_train, e_net)
     '''# Расчёт оптимизатора ВЫКИНУТЬ ИЗ РЕЛИЗА!
     print 'Optimization before learning (for middle): '
-    temps = [Xc[30][i] for i in range(2, len(Xc[0]), 2)]
-    params = [Xc[30][0]] + [Xc[30][i] for i in range(3, len(Xc[0]), 2)]
+    temps = [Xc_train[30][i] for i in range(2, len(Xc_train[0]), 2)]
+    params = [Xc_train[30][0]] + [Xc_train[30][i] for i in range(3, len(Xc_train[0]), 2)]
+    print temps
+    print params
     print e.optimize(temps, count_of_rooms(datablock[0]), e_net, c_net, params)'''
     # Расчёт ошибок
     c_err, e_err = 0, 0
@@ -195,7 +198,9 @@ def _rec_split_(datablock, step, train_count):
 ''' Служебное '''
 # Получить количество комнат по выборке
 def count_of_rooms(datablock):
-    return int(len(datablock[3:]) / 5)
+    #return c_rooms
+    return int(u.urlopen(address + path + rooms).read()[3:])
+    #return int(len(datablock[3:]) / 5)
 
 # Ожидание данных
 def await():

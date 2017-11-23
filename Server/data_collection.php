@@ -1,6 +1,5 @@
 ﻿<?php
 header('Access-Control-Allow-Origin: *');
-
 include "functions.php";
 
 //Возвращает данные для обучения в формате JSON.
@@ -144,55 +143,22 @@ if (isset($_GET["get_rooms"]))
 //Server/data_collection.php?p=f,t,t,t,t&t=19,19,19,19,19&g=0.3
 //if
 
-
-if (isset($_GET["p"]) && isset($_GET["t"]) && isset($_GET["g"]))
+// Запуск нейронной сети в рабочем режиме.
+if(isset($_GET["start_network"])) {
 {
-	// Здесь показания кладутся в базу данных
-	// INSERT!!!
-	$arrayMoves       = explode(",", $_GET["p"]);
-	$arrayTemperature = explode(",", $_GET["t"]);
-	$gas              = $_GET["g"];
-	$arraySensors     = _sql("SELECT * FROM public.sensors");
-
-	$date = "";
-	foreach ($arrayMoves as $key => $value)
 	{
-		//Вставка значений датчика присутствия.
-		$moves    = $value == "f" ? "1" : "0";
-		$room     = $key + 1;
-		$date     = date("d.m.Y H:i:s");
-		$sensorID = $arraySensors[searchArrayFirstKey($arraySensors, "Движение" . $room)]["id_sensor"];
-		_sql("INSERT INTO public.status_sensors(sensor_id, smove, date, room_id) VALUES('" . $sensorID . "', '" . $moves . "', '" . $date . "', " . $room . ")");
-
-		//Вставка значений температуры.
-		$temperature = $arrayTemperature[$key];
-		$sensorID    = $arraySensors[searchArrayFirstKey($arraySensors, "Температура" . $room)]["id_sensor"];
-
-		// РАСКОММЕНТИРОВАТЬ ЗАПРОС!
-		//_sql("INSERT INTO public.status_sensors(sensor_id, celsium, date, room_id) VALUES('" .$sensorID ."', '" .$temperature ."', '" .$date ."', " .$room .")");
-	}
-	//Вставка крутилки газа.
-	$sensorID = $arraySensors[searchArrayFirstKey($arraySensors, "ЗадвижкаБойлера")]["id_sensor"];
-
-	// РАСКОММЕНТИРОВАТЬ ЗАПРОС!
-	//_sql("INSERT INTO public.status_sensors(sensor_id, twister_gas, date, room_id) VALUES('" .$sensorID ."', '" .$gas ."', '" .$date ."', 6)");
-
 	if ($_GET["is_econom"])
 	{
 		// Дёргаем Питона для эконома
-		//exec("python ../neurohouse.py -e");
-		$temp = ['Данные', 'для', 'эконома', 1, $_GET["g"]];
+		exec("python ../neurohouse.py -e");
+		//print_r($output);
 	}
 	else
 	{
 		// Дёргаем Питона для комфорта
-		//exec("python ../neurohouse.py -c");
-		$temp = ['Данные', 'для', 'комфорта', 3, 4];
+		exec("python ../neurohouse.py -c");
 	}
-
-	// Здесь дёргаем последнюю запись крутилок из БД
-	// SELECT!!!
-	// и возвращаем в json'е
+	// Здесь дёргаем последнюю запись крутилок из БД и возвращаем в json'е
 	$result = _sql("SELECT * FROM public.logs ORDER BY date DESC LIMIT 1");
 	$answer = json_decode($result[0]["log"]);
 	echo json_encode($answer, JSON_UNESCAPED_UNICODE);
@@ -206,13 +172,13 @@ if (isset($_GET["start_learning"]))
 	{
 		//Дергаем Питон для генерации обучающей выборки.
 		//СНЯТЬ КОММЕНТАРИЙ.
-		//exec("python ../database/generate_data.py");
+		exec("python ../database/generate_data.py");
 	}
 	elseif ($_GET["start_learning"] == 2)
 	{
 		//Дергаем Питона для запуска процесса обучения.
 		//СНЯТЬ КОММЕНТАРИЙ.
-		//exec("python ../neurohouse.py --learn-only");
+		exec("python ../neurohouse.py --learn-only");
 	}
 }
 

@@ -3,8 +3,7 @@
     <title>
         Умный дом. Нейросеть.
     </title>
-    <script type="text/javascript" src="js/jquery-2.2.4.min.js"></script>
-    <!--<script type="text/javascript" src="http://code.jquery.com/jquery-2.2.4.js"></script>-->
+    <script type="text/javascript" src="js/jquery-2.2.4.min.js"></script>    
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="css/bootstrap-theme.min.css">
     <script src="js/bootstrap.min.js"></script>
@@ -13,9 +12,8 @@
     <link rel="stylesheet" href="custom.css">
 </head>
 <body class="container" onload="SendGet()">
-<h2 align="center" class="title">Система эмуляции умного дома</h2>
+<h2 align="center" class="title">Управление "умным домом"</h2>
 
-<!--<div class="col-md-5"></div>-->
 <div class="row col-sm-2">
     <div class="can-toggle can-toggle--size-large col-sm-2">
         <input id="c" type="checkbox">
@@ -28,13 +26,12 @@
 <div class="col-sm-1">
     <button class="btn-lg btn btn-warning" onclick="StartLearning()">&nbsp;Начать обучение&nbsp;</button>
 </div>
-<br><br>
 
 <div class="col-sm-12">
 <table class="table rooms table-striped table-bordered table-hover text-center" align="center">
 </table>
 </div>
-<div class="message"></div>
+<div class="col-sm-12 message"></div>
 
 <script type="text/javascript" src="script.js"></script>
 </body>
