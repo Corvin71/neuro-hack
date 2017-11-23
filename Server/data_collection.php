@@ -144,10 +144,9 @@ if (isset($_GET["get_rooms"]))
 //if
 
 // Запуск нейронной сети в рабочем режиме.
-if(isset($_GET["start_network"])) {
+if(isset($_GET["start_network"]))
 {
-	{
-	if ($_GET["is_econom"])
+	if (isset($_GET["is_econom"]))
 	{
 		// Дёргаем Питона для эконома
 		exec("python ../neurohouse.py -e");

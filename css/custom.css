@@ -1,0 +1,389 @@
+.demo-1 .bar {
+    /* Size and position */
+    font-size: 20px; /* 1em */
+    width: 10em;
+    height: 1em;
+    position: relative;
+    margin: 100px auto;
+    display: none;
+
+    /* Styles */
+    border-radius: .5em; /* Height/2 */
+    background: white; /* Fallback */
+    background: rgba(255,255,255,0.6);
+    box-shadow:
+            0 0 0 .05em rgba(100,100,100,0.075), /* Subtle border */
+            0 0 0 .25em rgba(0,0,0,0.1), /* Outter border */
+            inset 0 .1em .05em rgba(0,0,0,0.1), /* Inset shadow */
+            0 .05em rgba(255,255,255,0.7); /* Slight reflection */
+}
+
+.demo-1 .bar:after {
+    /* Content and position */
+    content: "Расчет...";
+    position: absolute;
+    left: 30%;
+    top: 150%;
+
+    /* Font styles */
+    font-family: 'Carrois Gothic', sans-serif;
+    font-size: 1em;
+    color: #555;
+    text-shadow: 0 .05em rgba(255,255,255,0.7);
+}
+
+.demo-1 .sphere {
+    /* Size */
+    display: block;
+    width: 1em;
+    height: 100%;
+
+    /* Styles */
+    border-radius: 50%;
+    background: linear-gradient(#eee, #ddd);
+    box-shadow:
+            inset 0 .15em .1em rgba(255,255,255,0.3), /* Top light */
+            inset 0 -.1em .15em rgba(0,0,0,0.15), /* Bottom shadow */
+            0 0 .25em rgba(0,0,0,0.3); /* Outter shadow */
+
+    /* Animation */
+    animation: move 1.75s ease-in-out infinite alternate;
+}
+
+@keyframes move {
+    to { margin-left: 90%; }
+}
+
+
+
+.can-toggle.can-toggle--size-large input[type="checkbox"]:focus ~ label .can-toggle__switch:after, .can-toggle.can-toggle--size-large input[type="checkbox"]:hover ~ label .can-toggle__switch:after {
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.4);
+}
+.can-toggle.can-toggle--size-large input[type="checkbox"]:checked ~ label .can-toggle__switch:after {
+    -webkit-transform: translate3d(78px, 0, 0);
+    transform: translate3d(78px, 0, 0);
+}
+.can-toggle.can-toggle--size-large input[type="checkbox"]:checked:focus ~ label .can-toggle__switch:after, .can-toggle.can-toggle--size-large input[type="checkbox"]:checked:hover ~ label .can-toggle__switch:after {
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.4);
+}
+.can-toggle.can-toggle--size-large label {
+    font-size: 14px;
+}
+.can-toggle.can-toggle--size-large label .can-toggle__switch {
+    height: 50px;
+    -webkit-flex: 0 0 160px;
+    -ms-flex: 0 0 160px;
+    flex: 0 0 163px;
+    border-radius: 4px;
+}
+.can-toggle.can-toggle--size-large label .can-toggle__switch:before {
+    left: 80px;
+    font-size: 14px;
+    line-height: 50px;
+    width: 80px;
+    padding: 0 5px;
+}
+.can-toggle.can-toggle--size-large label .can-toggle__switch:after {
+    top: 2px;
+    left: 2px;
+    border-radius: 2px;
+    width: 80px;
+    line-height: 45px;
+    font-size: 14px;
+}
+.can-toggle.can-toggle--size-large label .can-toggle__switch:hover:after {
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.4);
+}
+
+
+.can-toggle {
+    position: relative;
+}
+.can-toggle *, .can-toggle *:before, .can-toggle *:after {
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.can-toggle input[type="checkbox"] {
+    opacity: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+.can-toggle input[type="checkbox"][disabled] ~ label {
+    pointer-events: none;
+}
+.can-toggle input[type="checkbox"][disabled] ~ label .can-toggle__switch {
+    opacity: 0.4;
+}
+.can-toggle input[type="checkbox"]:checked ~ label .can-toggle__switch:before {
+    content: attr(data-unchecked);
+    left: 0;
+}
+.can-toggle input[type="checkbox"]:checked ~ label .can-toggle__switch:after {
+    content: attr(data-checked);
+}
+.can-toggle label {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    position: relative;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center;
+}
+.can-toggle label .can-toggle__label-text {
+    -webkit-flex: 1;
+    -ms-flex: 1;
+    flex: 1;
+    padding-left: 32px;
+}
+.can-toggle label .can-toggle__switch {
+    position: relative;
+}
+.can-toggle label .can-toggle__switch:before {
+    content: attr(data-checked);
+    position: absolute;
+    top: 0;
+    text-transform: uppercase;
+    text-align: center;
+}
+.can-toggle label .can-toggle__switch:after {
+    content: attr(data-unchecked);
+    position: absolute;
+    z-index: 5;
+    text-transform: uppercase;
+    text-align: center;
+    background: white;
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+}
+.can-toggle input[type="checkbox"][disabled] ~ label {
+    color: rgba(119, 119, 119, 0.5);
+}
+.can-toggle input[type="checkbox"]:focus ~ label .can-toggle__switch, .can-toggle input[type="checkbox"]:hover ~ label .can-toggle__switch {
+    background-color: #777;
+}
+.can-toggle input[type="checkbox"]:focus ~ label .can-toggle__switch:after, .can-toggle input[type="checkbox"]:hover ~ label .can-toggle__switch:after {
+    color: #5e5e5e;
+}
+.can-toggle input[type="checkbox"]:hover ~ label {
+    color: #6a6a6a;
+}
+.can-toggle input[type="checkbox"]:checked ~ label:hover {
+    color: #55bc49;
+}
+.can-toggle input[type="checkbox"]:checked ~ label .can-toggle__switch {
+    background-color: #70c767;
+}
+
+
+.can-toggle label .can-toggle__switch {
+    -webkit-transition: background-color 0.3s cubic-bezier(0, 1, 0.5, 1);
+    transition: background-color 0.3s cubic-bezier(0, 1, 0.5, 1);
+    background: #848484;
+}
+.can-toggle label .can-toggle__switch:before {
+    color: rgba(255, 255, 255, 0.5);
+}
+.can-toggle label .can-toggle__switch:after {
+    -webkit-transition: -webkit-transform 0.3s cubic-bezier(0, 1, 0.5, 1);
+    transition: transform 0.3s cubic-bezier(0, 1, 0.5, 1);
+    color: #777;
+}
+
+input[type=range] {
+    /*removes default webkit styles*/
+    -webkit-appearance: none;
+
+    /*fix for FF unable to apply focus style bug */
+    border: 1px solid white;
+
+    /*required for proper track sizing in FF*/
+    width: 100%;
+}
+input[type=range]::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 5px;
+    background: #ddd;
+    border: none;
+    border-radius: 3px;
+}
+input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    border: none;
+    height: 16px;
+    width: 16px;
+    border-radius: 50%;
+    background: goldenrod;
+    margin-top: -4px;
+}
+input[type=range]:focus {
+    outline: none;
+}
+input[type=range]:focus::-webkit-slider-runnable-track {
+    background: #ccc;
+}
+
+input[type=range]::-moz-range-track {
+    width: 300px;
+    height: 5px;
+    background: #ddd;
+    border: none;
+    border-radius: 3px;
+}
+input[type=range]::-moz-range-thumb {
+    border: none;
+    height: 16px;
+    width: 16px;
+    border-radius: 50%;
+    background: goldenrod;
+}
+
+/*hide the outline behind the border*/
+input[type=range]:-moz-focusring{
+    outline: 1px solid white;
+    outline-offset: -1px;
+}
+
+input[type=range]::-ms-track {
+    width: 300px;
+    height: 5px;
+
+    /*remove bg colour from the track, we'll use ms-fill-lower and ms-fill-upper instead */
+    background: transparent;
+
+    /*leave room for the larger thumb to overflow with a transparent border */
+    border-color: transparent;
+    border-width: 6px 0;
+
+    /*remove default tick marks*/
+    color: transparent;
+}
+input[type=range]::-ms-fill-lower {
+    background: #777;
+    border-radius: 10px;
+}
+input[type=range]::-ms-fill-upper {
+    background: #ddd;
+    border-radius: 10px;
+}
+input[type=range]::-ms-thumb {
+    border: none;
+    height: 16px;
+    width: 16px;
+    border-radius: 50%;
+    background: goldenrod;
+}
+input[type=range]:focus::-ms-fill-lower {
+    background: #888;
+}
+input[type=range]:focus::-ms-fill-upper {
+    background: #ccc;
+}
+
+
+input[type=range]::-ms-track {
+    width: 300px;
+    height: 5px;
+
+    /*remove bg colour from the track, we'll use ms-fill-lower and ms-fill-upper instead */
+    background: transparent;
+
+    /*leave room for the larger thumb to overflow with a transparent border */
+    border-color: transparent;
+    border-width: 6px 0;
+
+    /*remove default tick marks*/
+    color: transparent;
+}
+input[type=range]::-ms-fill-lower {
+    background: #777;
+    border-radius: 10px;
+}
+input[type=range]::-ms-fill-upper {
+    background: #ddd;
+    border-radius: 10px;
+}
+input[type=range]::-ms-thumb {
+    border: none;
+    height: 16px;
+    width: 16px;
+    border-radius: 50%;
+    background: goldenrod;
+}
+input[type=range]:focus::-ms-fill-lower {
+    background: #888;
+}
+input[type=range]:focus::-ms-fill-upper {
+    background: #ccc;
+}
+
+
+#slider-container {
+    width: 80%;
+    height: 80px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    position: relative;
+    top: 50%;
+    margin: 0 auto;
+    text-align: center;
+    background: #FFF;
+    border-radius: 5px;
+    padding: 35px 40px 30px 40px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.ui-slider {
+    background-color: #1ABC9C;
+    background-image: -webkit-linear-gradient(left, #1ABC9C 0%, #F1C40F 50%, #E74C3C 100%);
+    background-image: linear-gradient(to right,#1ABC9C 0%, #F1C40F 50%, #E74C3C 100%);
+}
+.ui-slider * {
+    outline: none;
+}
+.ui-slider .slider-range-inverse {
+    background: #CCC;
+    position: absolute;
+    right: 0;
+}
+.ui-slider .ui-slider-range {
+    background: transparent;
+}
+.ui-slider .ui-slider-handle {
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
+    background: #FFF;
+    top: -7px;
+    border-radius: 50%;
+    border-width: 0;
+}
+.ui-slider .ui-slider-handle:active {
+    box-shadow: 0 3px 20px rgba(0, 0, 0, 0.5);
+}
+.ui-slider .ui-slider-handle .dot {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    background: transparent;
+    overflow: hidden;
+}
+.ui-slider .ui-slider-handle .dot .handle-track {
+    display: block;
+    height: 18px;
+    background-color: #1ABC9C;
+    background-image: -webkit-linear-gradient(left, #1ABC9C 0%, #F1C40F 50%, #E74C3C 100%);
+    background-image: linear-gradient(to right,#1ABC9C 0%, #F1C40F 50%, #E74C3C 100%);
+    position: absolute;
+    padding-right: 18px;
+}

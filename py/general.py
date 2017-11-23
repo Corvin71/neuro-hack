@@ -10,7 +10,7 @@ import comfort as c
 import econom as e
 
 # Пути сервера
-address     = 'http://corvin71.ddns.net'
+address     = 'http://localhost'
 path        = '/smartHack/Server/data_collection.php'
 answer      = '/smartHack/Server/answer.php'
 # Параметры сервера
@@ -53,21 +53,15 @@ def post_data(result):
 # Вызывается, когда нужно обучить сеть.
 # Возвращает количество дней, оставшихся для обучения
 def learning(datablock, c_net, e_net, days_left):
+    # Разделение данных
     train, test = split_datablock(datablock)
     Xc_train, Yc_train = to_c_blocks(train)
     Xc_test, Yc_test = to_c_blocks(test)
     Xe_train, Ye_train = to_e_blocks(train)
     Xe_test, Ye_test = to_e_blocks(test)
-    
+    # Обучение
     c_net = c.learn_epoch(Xc_train, Yc_train, c_net)
     e_net = e.learn_epoch(Xe_train, Ye_train, e_net)
-    '''# Расчёт оптимизатора ВЫКИНУТЬ ИЗ РЕЛИЗА!
-    print 'Optimization before learning (for middle): '
-    temps = [Xc_train[30][i] for i in range(2, len(Xc_train[0]), 2)]
-    params = [Xc_train[30][0]] + [Xc_train[30][i] for i in range(3, len(Xc_train[0]), 2)]
-    print temps
-    print params
-    print e.optimize(temps, count_of_rooms(datablock[0]), e_net, c_net, params)'''
     # Расчёт ошибок
     c_err, e_err = 0, 0
     for i in range(len(Xc_test)):
@@ -86,8 +80,7 @@ def learning(datablock, c_net, e_net, days_left):
 # Возвращает вектор крутилок при поддержании режима "Комфорт"
 def comfort(datapiece, c_net):
     log('Task for comfort-mode')
-    x, y = to_c_block(datapiece)
-    return c.calc(x, c_net)
+    return c.calc(datapiece, c_net)
 
 # Возвращает вектор крутилок при поддержании режима "Эконом"
 def econom(datapiece, c_net, e_net):
@@ -259,7 +252,7 @@ def work_mode(em=False):
         log('Failure! Trying to use non-trained net in ' + mode)
         post_data(['Сбой! Попытка использовать необученную сеть.'])
         return
-    result = econom(data, c_net, e_net) if em else comfort(data, c_net, e_net)
+    result = econom(data, c_net, e_net) if em else comfort(data, c_net)
     post_data(result)
     return
 
