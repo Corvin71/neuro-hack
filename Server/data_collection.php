@@ -1,4 +1,5 @@
 ﻿<?php
+header('Access-Control-Allow-Origin: *');
 
 include "functions.php";
 
@@ -85,6 +86,40 @@ if (isset($_GET["is_learning"]))
 	echo json_encode($resultArray, JSON_UNESCAPED_UNICODE);
 }
 
+if (isset($_GET["is_work"]))
+{
+	$countRooms     = intval(_sql("SELECT count(*) FROM public.rooms")[0]["count"]);
+	$countRecords   = intval(_sql("SELECT count(*) FROM public.status_sensors")[0]["count"]);
+	$_statusSensors = _sql("SELECT *  FROM public.status_sensors ORDER BY date, room_id DESC LIMIT " .$countRooms ." OFFSET " .($countRecords - $countRooms));
+
+
+	$tempArray = array();
+
+	if (count($_statusSensors) != 0)
+	{
+		$date         = timeToValue($_statusSensors[0]["date"]);
+		$tempArray[0] = round((float) $date, 3);
+		$tempArray[1] = round((float) $_statusSensors[0]["consum_gas"], 3);
+
+		$index = 2;
+		foreach ($_statusSensors as $value)
+		{
+			if ($value["celsium"] != "")
+			{
+				$tempArray[$index] = round(((float) $value["celsium"]) / 45.0, 3);
+				$index++;
+			}
+			if ($value["smove"] != "")
+			{
+				$tempArray[$index] = round((float) $value["smove"], 3);
+				$index++;
+			}
+		}
+	}
+
+	echo json_encode($tempArray, JSON_UNESCAPED_UNICODE);
+}
+
 //Возвращает количество комнат.
 if (isset($_GET["how_rooms"]))
 {
@@ -110,43 +145,46 @@ if (isset($_GET["get_rooms"]))
 //if
 
 
-if(isset($_GET["p"]) && isset($_GET["t"]) && isset($_GET["g"])) {
+if (isset($_GET["p"]) && isset($_GET["t"]) && isset($_GET["g"]))
+{
 	// Здесь показания кладутся в базу данных
 	// INSERT!!!
-	$arrayMoves = explode(",", $_GET["p"]);
+	$arrayMoves       = explode(",", $_GET["p"]);
 	$arrayTemperature = explode(",", $_GET["t"]);
-	$gas = $_GET["g"];
-	$arraySensors = _sql("SELECT * FROM public.sensors");
+	$gas              = $_GET["g"];
+	$arraySensors     = _sql("SELECT * FROM public.sensors");
 
 	$date = "";
-	foreach ($arrayMoves as $key => $value) {
+	foreach ($arrayMoves as $key => $value)
+	{
 		//Вставка значений датчика присутствия.
-		$moves = $value == "f" ? "1" : "0";
-		$room = $key + 1;
-		$date = date("d.m.Y H:i:s");
-		$sensorID = $arraySensors[searchArrayFirstKey($arraySensors, "Движение" .$room)]["id_sensor"];
-		_sql("INSERT INTO public.status_sensors(sensor_id, smove, date, room_id) VALUES('".$sensorID ."', '" .$moves ."', '" .$date ."', " .$room .")");
+		$moves    = $value == "f" ? "1" : "0";
+		$room     = $key + 1;
+		$date     = date("d.m.Y H:i:s");
+		$sensorID = $arraySensors[searchArrayFirstKey($arraySensors, "Движение" . $room)]["id_sensor"];
+		_sql("INSERT INTO public.status_sensors(sensor_id, smove, date, room_id) VALUES('" . $sensorID . "', '" . $moves . "', '" . $date . "', " . $room . ")");
 
 		//Вставка значений температуры.
 		$temperature = $arrayTemperature[$key];
-		$sensorID = $arraySensors[searchArrayFirstKey($arraySensors, "Температура" .$room)]["id_sensor"];
-		
+		$sensorID    = $arraySensors[searchArrayFirstKey($arraySensors, "Температура" . $room)]["id_sensor"];
+
 		// РАСКОММЕНТИРОВАТЬ ЗАПРОС!
 		//_sql("INSERT INTO public.status_sensors(sensor_id, celsium, date, room_id) VALUES('" .$sensorID ."', '" .$temperature ."', '" .$date ."', " .$room .")");
 	}
 	//Вставка крутилки газа.
 	$sensorID = $arraySensors[searchArrayFirstKey($arraySensors, "ЗадвижкаБойлера")]["id_sensor"];
-	
+
 	// РАСКОММЕНТИРОВАТЬ ЗАПРОС!
 	//_sql("INSERT INTO public.status_sensors(sensor_id, twister_gas, date, room_id) VALUES('" .$sensorID ."', '" .$gas ."', '" .$date ."', 6)");
 
-	if($_GET["is_econom"])
+	if ($_GET["is_econom"])
 	{
 		// Дёргаем Питона для эконома
 		//exec("python ../neurohouse.py -e");
 		$temp = ['Данные', 'для', 'эконома', 1, $_GET["g"]];
 	}
-	else {
+	else
+	{
 		// Дёргаем Питона для комфорта
 		//exec("python ../neurohouse.py -c");
 		$temp = ['Данные', 'для', 'комфорта', 3, 4];
@@ -162,22 +200,27 @@ if(isset($_GET["p"]) && isset($_GET["t"]) && isset($_GET["g"])) {
 
 
 //Запуск скрипта обучающей выборки python.
-if (isset($_GET["start_learning"])) {
-	if ($_GET["start_learning"] == 1) {
+if (isset($_GET["start_learning"]))
+{
+	if ($_GET["start_learning"] == 1)
+	{
 		//Дергаем Питон для генерации обучающей выборки.
 		//СНЯТЬ КОММЕНТАРИЙ.
 		//exec("python ../database/generate_data.py");
 	}
-	elseif ($_GET["start_learning"] == 2) {
+	elseif ($_GET["start_learning"] == 2)
+	{
 		//Дергаем Питона для запуска процесса обучения.
 		//СНЯТЬ КОММЕНТАРИЙ.
 		//exec("python ../neurohouse.py --learn-only");
 	}
 }
 
-if (isset($_GET["info_learn"])) {
+if (isset($_GET["info_learn"]))
+{
 	//Если принят 0 - вернуть из БД, запущено ли обучение, 1 - запустить обучение, 2 - остановить обучение.
-	switch ($_GET["info_learn"]) {
+	switch ($_GET["info_learn"])
+	{
 		case "0":
 			$result = _sql("SELECT state FROM public.is_learning LIMIT 1")[0]["state"];
 			echo json_encode($result, JSON_UNESCAPED_UNICODE);
@@ -192,27 +235,50 @@ if (isset($_GET["info_learn"])) {
 }
 
 //Возвращает данные по выборке для обучения.
-if (isset($_GET["get_learning_selection"])) {
-	$resultSql = _sql("SELECT * FROM public.info_learning LIMIT " .$_GET["length"] ." OFFSET " .$_GET["start"] .";");
+if (isset($_GET["get_learning_selection"]))
+{
+	$query = "SELECT * FROM public.info_learning ";
+
+	if (isset($_GET["length"]))
+	{
+		$query += "LIMIT " + $_GET["length"];
+	}
+	if (isset($_GET["start"]))
+	{
+		$query += " OFFSET " + $_GET["start"];
+	}
+	$resultSql = _sql($query);
 
 	$iTotalRecords = _sql("SELECT count(*) FROM public.status_sensors")[0]["count"];
 
-	$newResult = array("draw" => isset ( $_GET['draw'] ) ? intval( $_GET['draw'] ) : 0,
+	$newResult = array("draw"         => isset ($_GET['draw']) ? intval($_GET['draw']) : 0,
 	                   "recordsTotal" => intval($iTotalRecords),
-	                   "data" => $resultSql);
+	                   "data"         => $resultSql);
 
 	echo json_encode($newResult, JSON_UNESCAPED_UNICODE);
 }
 
 //Получение статистики процесса обучения.
-if (isset($_GET["get_info_learn"])) {
-	$resultSql = _sql("SELECT * FROM public.view_info_learn LIMIT " .$_GET["length"] ." OFFSET " .$_GET["start"] .";");
+if (isset($_GET["get_info_learn"]))
+{
+	$query = "SELECT * FROM public.view_info_learn ";
+
+	if (isset($_GET["length"]))
+	{
+		$query += "LIMIT " + $_GET["length"];
+	}
+	if (isset($_GET["start"]))
+	{
+		$query += " OFFSET " + $_GET["start"];
+	}
+
+	$resultSql = _sql($query);
 
 	$iTotalRecords = _sql("SELECT count(*) FROM public.info_learn")[0]["count"];
 
-	$newResult = array("draw" => isset ( $_GET['draw'] ) ? intval( $_GET['draw'] ) : 0,
+	$newResult = array("draw"         => isset ($_GET['draw']) ? intval($_GET['draw']) : 0,
 	                   "recordsTotal" => intval($iTotalRecords),
-	                   "data" => $resultSql);
+	                   "data"         => $resultSql);
 
 	echo json_encode($newResult, JSON_UNESCAPED_UNICODE);
 }
