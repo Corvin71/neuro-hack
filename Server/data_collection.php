@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 header('Access-Control-Allow-Origin: *');
 include "functions.php";
 
@@ -146,7 +146,7 @@ if (isset($_GET["get_rooms"]))
 // Запуск нейронной сети в рабочем режиме.
 if(isset($_GET["start_network"]))
 {
-	if (isset($_GET["is_econom"]))
+	/*if (isset($_GET["is_econom"]))
 	{
 		// Дёргаем Питона для эконома
 		exec("python ../neurohouse.py -e");
@@ -156,10 +156,13 @@ if(isset($_GET["start_network"]))
 	{
 		// Дёргаем Питона для комфорта
 		exec("python ../neurohouse.py -c");
-	}
+	}*/
 	// Здесь дёргаем последнюю запись крутилок из БД и возвращаем в json'е
 	$result = _sql("SELECT * FROM public.logs ORDER BY date DESC LIMIT 1");
-	$answer = json_decode($result[0]["log"]);
+    $result2 = _sql("select string_agg(celsium, ', ') from (select celsium, room_id  from status_sensors  order by date desc, room_id asc limit 6) as t where room_id in (SELECT id_room from rooms where name <> 'Бойлерная');");
+    $answer = array();
+    $answer[] = $result[0]["log"];
+    $answer[] = "[" .$result2[0]["string_agg"] ."]";
 	echo json_encode($answer, JSON_UNESCAPED_UNICODE);
 }
 
@@ -192,6 +195,8 @@ if (isset($_GET["info_learn"]))
 			break;
 		case "1":
 			_sql("UPDATE public.is_learning SET state = true");
+			//В данный момент осуществляется запуск сети (висит целую неделю на обучение).
+			exec("python ../neurohouse.py --learn-only"); 
 			break;
 		case "2":
 			_sql("UPDATE public.is_learning SET state = false");
