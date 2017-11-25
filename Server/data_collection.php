@@ -85,12 +85,12 @@ if (isset($_GET["is_learning"]))
 	echo json_encode($resultArray, JSON_UNESCAPED_UNICODE);
 }
 
+// Вызывается Питоном, забирает рабочую выборку данных.
 if (isset($_GET["is_work"]))
 {
 	$countRooms     = intval(_sql("SELECT count(*) FROM public.rooms")[0]["count"]);
 	$countRecords   = intval(_sql("SELECT count(*) FROM public.status_sensors")[0]["count"]);
 	$_statusSensors = _sql("SELECT *  FROM public.status_sensors ORDER BY date, room_id DESC LIMIT " .$countRooms ." OFFSET " .($countRecords - $countRooms));
-
 
 	$tempArray = array();
 
@@ -98,9 +98,24 @@ if (isset($_GET["is_work"]))
 	{
 		$date         = timeToValue($_statusSensors[0]["date"]);
 		$tempArray[0] = round((float) $date, 3);
-		$tempArray[1] = round((float) $_statusSensors[0]["consum_gas"], 3);
+		$tempArray[1] = 1;	// Сюда вхреначить определение чётного/нечётного дня
+		$tempArray[2] = round((float) $_statusSensors[0]["consum_gas"], 3);
+		$index = 3;
+		for($i = 0; $i < count($_statusSensors); $i+=2) {
+			if($_statusSensors[$i]['celsium'] != "") {
+				$tempArray[$index] = round(($_statusSensors[$i + 1]["celsium"] - $_statusSensors[$i]["celsium"]) / 45.0, 3);
+				$index++;
+			}
+			if ($_statusSensors[$i]["smove"] != "") {
+				$tempArray[$index] = round((float) $_statusSensors[$i + 1]["smove"], 3);
+				$index++;
+			}
+			//print_r(count($tempArray));
+		}
+	}
 
-		$index = 2;
+/*
+
 		foreach ($_statusSensors as $value)
 		{
 			if ($value["celsium"] != "")
@@ -115,8 +130,9 @@ if (isset($_GET["is_work"]))
 			}
 		}
 	}
+*/
+	echo json_encode(count($tempArray), JSON_UNESCAPED_UNICODE);
 
-	echo json_encode($tempArray, JSON_UNESCAPED_UNICODE);
 }
 
 //Возвращает количество комнат.
@@ -146,7 +162,7 @@ if (isset($_GET["get_rooms"]))
 // Запуск нейронной сети в рабочем режиме.
 if(isset($_GET["start_network"]))
 {
-	/*if (isset($_GET["is_econom"]))
+	if (isset($_GET["is_econom"]))
 	{
 		// Дёргаем Питона для эконома
 		exec("python ../neurohouse.py -e");
@@ -156,13 +172,10 @@ if(isset($_GET["start_network"]))
 	{
 		// Дёргаем Питона для комфорта
 		exec("python ../neurohouse.py -c");
-	}*/
+	}
 	// Здесь дёргаем последнюю запись крутилок из БД и возвращаем в json'е
 	$result = _sql("SELECT * FROM public.logs ORDER BY date DESC LIMIT 1");
-    $result2 = _sql("select string_agg(celsium, ', ') from (select celsium, room_id  from status_sensors  order by date desc, room_id asc limit 6) as t where room_id in (SELECT id_room from rooms where name <> 'Бойлерная');");
-    $answer = array();
-    $answer[] = $result[0]["log"];
-    $answer[] = "[" .$result2[0]["string_agg"] ."]";
+	$answer = $result[0]["log"];
 	echo json_encode($answer, JSON_UNESCAPED_UNICODE);
 }
 

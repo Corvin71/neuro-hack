@@ -2,6 +2,14 @@
 import numpy as np
 import random as rnd
 
+# Нейроная сеть режима "Комфорт"
+# Входные параметры:
+# [T, D, G, dt1, p1, dt2, p2, ... dtn, pn]
+# T - время суток [0..1]
+# D - рабочий/выходной день (0 или 1)
+# dti - изменение температуры в i-й комнате [0..1]
+# pi - датчик присутствия человека в i-й комнате (0 или 1)
+
 # Функция активации
 def f(x):
     return 1.0 / (1.0 + np.exp(-x))
@@ -12,15 +20,17 @@ def error(y_train, y_test):
 
 # Инициализация сети
 def init(N):
-    W = np.zeros(shape=(2*N, 2*N + 2))
+    W = np.zeros(shape=(2*N, 2*N + 3))
     for i in range(2*N):
         W[i][0] = rnd.random()
-        W[i][1] = rnd.random()
-    for i in range(2, 2*N, 2):
+        if i % 2 != 0:
+            W[i][1] = rnd.random()
+        W[i][2] = rnd.random()
+    for i in range(3, 2*N, 2):
+        W[i - 3][i] = rnd.random()
         W[i - 2][i] = rnd.random()
-        W[i - 1][i] = rnd.random()
-        W[i - 2][i + 1] = rnd.random()
-        W[i - 1][i + 1] = rnd.random()
+        W[i - 4][i + 1] = rnd.random()
+        W[i - 3][i + 1] = rnd.random()
     return W
 
 # Одна итерация обучения

@@ -39,12 +39,12 @@ def get_data(learning=False, day=d.datetime.today().date()):
         log('Listening to sever')
         response = u.urlopen(address + path + is_work)
         log('Answer received')
-    c_rooms = int(u.urlopen(address + path + rooms).read()[3:])    
-    return j.loads(response.read()[3:])
+    #c_rooms = int(u.urlopen(address + path + rooms).read()[3:])    
+    return j.loads(response.read())
 
 # Загружает полученную информацию на сервер
 def post_data(result):
-    postData = "ans=" + str(result)
+    postData = "ans=" + str(list(result))
     request = u2.Request(address + answer, postData)
     response = u2.urlopen(request)
     return
@@ -73,8 +73,8 @@ def learning(datablock, c_net, e_net, days_left):
     # Логгирование и сохранение
     log('Epoch complete. Errors: comfort: ' + str(c_err) + '; econom: ' + str(e_err) + '; left (days): ' + str(days_left))
     save_net(c_net, e_net, days_left) # Сохранение данных каждый день
-    if days_left != 0:
-        await()
+    #if days_left != 0:
+        #await()
     return c_net, e_net, days_left
 
 # Возвращает вектор крутилок при поддержании режима "Комфорт"
@@ -130,8 +130,8 @@ def to_c_blocks(datablock):
     x = []
     y = []
     for datapiece in datablock:
-        temp_x = [datapiece[0], datapiece[2]] # Прикручиваем время суток и крутилку газа
-        for i in range(3, len(datapiece), 5):
+        temp_x = [datapiece[0], datapiece[3], datapiece[2]] # Прикручиваем время суток и крутилку газа
+        for i in range(4, len(datapiece), 5):
             temp_x.append(datapiece[i])       # Докидываем температуру
             temp_x.append(datapiece[i + 1])   # и присутствие
         x.append(temp_x)
@@ -148,7 +148,7 @@ def to_e_blocks(datablock):
     y = []
     for datapiece in datablock:
         temp_x = []
-        for i in range(3, len(datapiece), 5):
+        for i in range(4, len(datapiece), 5):
             temp_x.append(datapiece[i + 3]) # Привинчиваем крутилку радиатора
             temp_x.append(datapiece[i + 2]) # Присасываем крутилку кондиционера
             temp_x.append(datapiece[i])     # Присобачиваем температуру
@@ -192,7 +192,7 @@ def _rec_split_(datablock, step, train_count):
 # Получить количество комнат по выборке
 def count_of_rooms(datablock):
     #return c_rooms
-    return int(u.urlopen(address + path + rooms).read()[3:])
+    return int(u.urlopen(address + path + rooms).read())
     #return int(len(datablock[3:]) / 5)
 
 # Ожидание данных
@@ -226,10 +226,11 @@ def initialization():
 def continue_mode():
     log('Started in continue-mode')
     c_net, e_net, days_left = load_net('neuronet.npy') # Загружаем сети и количество дней
-    while days_left > 0:
+    if days_left > 0:
         datablock = get_data(learning=True)
         c_net, e_net, days_left = learning(datablock, c_net, e_net, days_left)
-    log('Successfully learned')
+    if days_left == 0:
+        log('Successfully learned')
     return
 
 # Режим обучения
